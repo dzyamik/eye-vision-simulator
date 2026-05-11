@@ -12,4 +12,16 @@ export default defineConfigWithVueTs(
   },
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
+  {
+    name: 'app/unused-vars',
+    rules: {
+      // Standard convention: an underscore prefix marks an arg/var as
+      // intentionally unused. Useful for stub function signatures (e.g.
+      // pipelineManager.attach(camera, key) before the body is written).
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+      ],
+    },
+  },
 );

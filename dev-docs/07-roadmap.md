@@ -220,8 +220,8 @@ For each pipeline, the pattern is:
 
 ### 6.1 Pipeline manager skeleton
 
-- [ ] `pipelineManager.ts` exposes `attach(camera, conditionKey)`, `detach(camera, conditionKey)`, `setUniforms(conditionKey, uniforms)`, `syncFromStore()`.
-- [ ] Maintains the stacking order from `03-eye-conditions.md`.
+- [x] `pipelineManager.ts` exposes `attach(camera, conditionKey)`, `detach(camera, conditionKey)`, `setUniforms(conditionKey, uniforms)`, `syncFromStore()`.
+- [x] Maintains the stacking order from `03-eye-conditions.md`.
 
 **Acceptance:** The manager exists, has no pipelines yet, and `syncFromStore()` is a no-op.
 
