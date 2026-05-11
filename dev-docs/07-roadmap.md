@@ -60,7 +60,7 @@ Goal: get the data model in place before any UI.
 
 ### 2.1 Implement `src/types/eyeSettings.ts`
 
-- [ ] Type definitions and `createDefaultEyeSettings()` factory from [`06-state-management.md`](./06-state-management.md).
+- [x] Type definitions and `createDefaultEyeSettings()` factory from [`06-state-management.md`](./06-state-management.md).
 
 **Acceptance:** Strict TS compile passes; `createDefaultEyeSettings()` returns the expected shape.
 
