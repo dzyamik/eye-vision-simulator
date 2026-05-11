@@ -132,8 +132,8 @@ Goal: a Phaser canvas living inside `ImpairedView`, rendering the current image 
 
 ### 4.1 `createGame.ts` and `VisionScene.ts`
 
-- [ ] Factory creates a Phaser game with `parent: HTMLElement`, `type: AUTO`, `transparent: false`, scale mode `RESIZE`.
-- [ ] `VisionScene` loads the current image as a texture and adds it as a single Sprite centered, scaled to fit the canvas.
+- [x] Factory creates a Phaser game with `parent: HTMLElement`, `type: AUTO`, `transparent: false`, scale mode `RESIZE`.
+- [x] `VisionScene` loads the current image as a texture and adds it as a single Sprite centered, scaled to fit the canvas.
 
 **Acceptance:** Mounting `ImpairedView` shows the same image as `OriginalView`, but rendered through Phaser.
 

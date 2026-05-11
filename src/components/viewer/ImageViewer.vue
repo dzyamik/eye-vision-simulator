@@ -8,6 +8,7 @@ import { ref } from 'vue';
 import { useImageStore } from '@/stores/image';
 import { useToastStore } from '@/stores/toast';
 
+import ImpairedView from './ImpairedView.vue';
 import OriginalView from './OriginalView.vue';
 
 const image = useImageStore();
@@ -77,9 +78,11 @@ function hasFiles(e: DragEvent): boolean {
     <section class="pane">
       <header class="pane-header">
         <h2 class="pane-title">Impaired</h2>
-        <span class="pane-hint">(Phaser canvas — Phase 4)</span>
+        <span class="pane-hint">(no effects yet — Phase 6)</span>
       </header>
-      <div class="pane-body pane-body--placeholder">Impaired view goes here</div>
+      <div class="pane-body">
+        <ImpairedView />
+      </div>
     </section>
 
     <div v-if="dragging" class="drop-overlay" aria-hidden="true">Drop image to load</div>

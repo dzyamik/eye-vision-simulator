@@ -1,0 +1,79 @@
+// Single Phaser scene that holds one Sprite of the current source image.
+// Filters/pipelines (Phase 6) attach to this scene's main camera; the sprite
+// itself stays a single, plain Image throughout the project's lifetime.
+//
+// setImage() is safe to call before the scene's create() has fired — the
+// request is queued and applied on create. Old textures are removed from
+// Phaser's TextureManager when a new image takes over so we don't leak GPU
+// memory across image swaps.
+
+import Phaser from 'phaser';
+
+export class VisionScene extends Phaser.Scene {
+  static readonly KEY = 'VisionScene';
+
+  private sprite: Phaser.GameObjects.Image | null = null;
+  private currentTextureKey: string | null = null;
+  private pendingSrc: string | null = null;
+  private isReady = false;
+  private nextKeyId = 0;
+
+  constructor() {
+    super({ key: VisionScene.KEY });
+  }
+
+  create(): void {
+    this.isReady = true;
+    this.scale.on('resize', this.fitSprite, this);
+    if (this.pendingSrc !== null) {
+      const src = this.pendingSrc;
+      this.pendingSrc = null;
+      this.setImage(src);
+    }
+  }
+
+  setImage(src: string): void {
+    if (!this.isReady) {
+      this.pendingSrc = src;
+      return;
+    }
+
+    const key = `vision-image-${++this.nextKeyId}`;
+    this.load.image(key, src);
+    this.load.once(`filecomplete-image-${key}`, () => {
+      this.applyTexture(key);
+    });
+    this.load.once('loaderror', (file: Phaser.Loader.File) => {
+      // Phaser's own loader logs the error; we just unblock the next load.
+      console.error('VisionScene image load failed:', file.src);
+    });
+    this.load.start();
+  }
+
+  private applyTexture(key: string): void {
+    if (this.sprite === null) {
+      this.sprite = this.add.image(0, 0, key).setOrigin(0.5);
+    } else {
+      this.sprite.setTexture(key);
+    }
+    if (this.currentTextureKey !== null && this.currentTextureKey !== key) {
+      this.textures.remove(this.currentTextureKey);
+    }
+    this.currentTextureKey = key;
+    this.fitSprite();
+  }
+
+  private fitSprite(): void {
+    if (this.sprite === null) return;
+    const cam = this.cameras.main;
+    const source = this.sprite.texture.getSourceImage() as
+      | HTMLImageElement
+      | HTMLCanvasElement;
+    const sw = source.width;
+    const sh = source.height;
+    if (sw === 0 || sh === 0) return;
+    const scale = Math.min(cam.width / sw, cam.height / sh);
+    this.sprite.setScale(scale);
+    this.sprite.setPosition(cam.width / 2, cam.height / 2);
+  }
+}
