@@ -47,8 +47,8 @@ Goal: get a Vite + Vue + TS + Pinia + Phaser project building to `./docs/` with 
 
 ### 1.5 ESLint + Prettier (optional but recommended)
 
-- [ ] Install `eslint`, `@vue/eslint-config-typescript`, `eslint-plugin-vue`, `prettier`.
-- [ ] Add `npm run lint` and `npm run format` scripts.
+- [x] Install `eslint`, `@vue/eslint-config-typescript`, `eslint-plugin-vue`, `prettier`.
+- [x] Add `npm run lint` and `npm run format` scripts.
 
 **Acceptance:** `npm run lint` runs without errors on the empty project.
 
