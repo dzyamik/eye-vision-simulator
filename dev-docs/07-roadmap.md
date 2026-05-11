@@ -235,8 +235,8 @@ For each pipeline, the pattern is:
 
 ### 6.3 Astigmatism pipeline
 
-- [ ] Directional blur shader.
-- [ ] Wired with magnitude and axis from the store.
+- [x] Directional blur shader.
+- [x] Wired with magnitude and axis from the store.
 
 **Acceptance:** Vertical lines blur more than horizontal at axis=90°, and vice versa at axis=0°.
 

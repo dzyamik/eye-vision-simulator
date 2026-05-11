@@ -23,6 +23,7 @@ import { watch } from 'vue';
 import { useEyeSettingsStore } from '@/stores/eyeSettings';
 import type { ConditionKey, EyeSettings } from '@/types/eyeSettings';
 
+import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipeline';
 import { disposeBlur, syncBlur } from './pipelines/BlurPipeline';
 
 export const STACKING_ORDER: readonly ConditionKey[] = [
@@ -96,12 +97,25 @@ function syncBlurFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
   });
 }
 
+function syncAstigmatismFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (camera === null) return;
+  syncAstigmatism(camera, {
+    leftActive: eye.left.astigmatism.enabled,
+    leftMagnitude: eye.left.astigmatism.magnitude,
+    leftAxis: eye.left.astigmatism.axis,
+    rightActive: eye.right.astigmatism.enabled,
+    rightMagnitude: eye.right.astigmatism.magnitude,
+    rightAxis: eye.right.astigmatism.axis,
+  });
+}
+
 export const pipelineManager: PipelineManager = {
   init(scene): void {
     if (camera !== null && stopWatch !== null) {
-      // Re-init: tear down the old watcher + filter so we don't double-up.
+      // Re-init: tear down the old watcher + filters so we don't double-up.
       stopWatch();
       disposeBlur(camera);
+      disposeAstigmatism(camera);
     }
     camera = scene.cameras.main;
     const eye = useEyeSettingsStore();
@@ -132,7 +146,8 @@ export const pipelineManager: PipelineManager = {
     if (camera === null) return;
     const eye = useEyeSettingsStore();
     syncBlurFromStore(eye);
-    // 6.3+ adds more per-condition syncs here (syncAstigmatism,
-    // syncColorVision, syncCataract, …).
+    syncAstigmatismFromStore(eye);
+    // 6.4+ adds more per-condition syncs here (syncColorVision,
+    // syncCataract, syncGlaucoma, …).
   },
 };
