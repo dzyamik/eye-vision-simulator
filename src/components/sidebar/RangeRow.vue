@@ -8,6 +8,8 @@
 // only the numeric fields of that specific condition (e.g. astigmatism's
 // `magnitude` / `axis`, not its `enabled` boolean).
 
+import type { WritableComputedRef } from 'vue';
+
 import { useEyeParam } from '@/composables/useEyeParam';
 import { RANGES } from '@/constants/ranges';
 import type { ConditionKey, EyeSettings } from '@/types/eyeSettings';
@@ -26,16 +28,19 @@ const props = defineProps<{
   disabledRight?: boolean;
 }>();
 
+// Templates auto-unwrap refs, so v-model bindings reference these refs
+// directly (NOT via `.value`). The cast keeps TS calm; useEyeParam's runtime
+// return is already a WritableComputedRef.
 const left = useEyeParam(
   'left',
   props.condition,
   props.param,
-) as unknown as { value: number };
+) as unknown as WritableComputedRef<number>;
 const right = useEyeParam(
   'right',
   props.condition,
   props.param,
-) as unknown as { value: number };
+) as unknown as WritableComputedRef<number>;
 
 // The (RANGES, condition, param) lookup is correct at runtime — both keys
 // are typed against the same EyeSettings shape — but TS can't bridge the
@@ -52,7 +57,7 @@ const range = (
     <div class="eye-row">
       <span class="eye-tag">L</span>
       <RangeInput
-        v-model="left.value"
+        v-model="left"
         label=""
         :min="range.min"
         :max="range.max"
@@ -64,7 +69,7 @@ const range = (
     <div class="eye-row">
       <span class="eye-tag">R</span>
       <RangeInput
-        v-model="right.value"
+        v-model="right"
         label=""
         :min="range.min"
         :max="range.max"
