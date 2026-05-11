@@ -155,11 +155,11 @@ This is the part most likely to go wrong. Rules:
 
 The bottom view has four modes, controlled by `viewSettings.mode`:
 
-| Mode | What's rendered |
-|---|---|
-| `both` | A blended average of left-eye and right-eye effects (default). Closest to lived perception. |
-| `left` | Left eye's config only. The image fills the canvas. |
-| `right` | Right eye's config only. The image fills the canvas. |
+| Mode    | What's rendered                                                                                                                                          |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `both`  | A blended average of left-eye and right-eye effects (default). Closest to lived perception.                                                              |
+| `left`  | Left eye's config only. The image fills the canvas.                                                                                                      |
+| `right` | Right eye's config only. The image fills the canvas.                                                                                                     |
 | `split` | The canvas is split vertically. Left half = left eye, right half = right eye. Each half is a separately rendered sub-region with its own pipeline stack. |
 
 `split` is the trickiest. Implementation: render the same scene twice into two render-textures (left config, right config), then composite them into the final frame with a tiny shader or two side-by-side Phaser cameras. Defer detailed design to phase 4 of the roadmap.
@@ -174,12 +174,12 @@ The shader reads the mask's alpha and darkens the input image accordingly (or ap
 
 ## Performance budget
 
-| Scenario | Target |
-|---|---|
+| Scenario                             | Target                       |
+| ------------------------------------ | ---------------------------- |
 | Slider drag, single condition active | 60 fps on a 2020 MacBook Air |
-| All conditions on at once | ≥ 30 fps |
-| First paint of impaired view | < 500 ms after image load |
-| Bundle size (gzipped) | < 500 KB (Phaser dominates) |
+| All conditions on at once            | ≥ 30 fps                     |
+| First paint of impaired view         | < 500 ms after image load    |
+| Bundle size (gzipped)                | < 500 KB (Phaser dominates)  |
 
 Slider-spam coalescing: use `requestAnimationFrame` to batch updates so the GPU isn't called more than once per frame.
 

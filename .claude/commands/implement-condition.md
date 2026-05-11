@@ -25,11 +25,13 @@ Do not proceed until these are settled.
 6. Wire it into `src/phaser/PipelineManager.ts` in the correct stacking position
 
 **Step 3 — Verify.**
+
 - `npm run typecheck` passes
 - `npm run build` succeeds
 - Manually walk through: load the sample image, toggle the new condition on, move each parameter slider, confirm visual response is real-time (<16 ms frame) and per-eye if applicable.
 
 **Step 4 — Document.**
+
 - Add an entry to `dev-docs/03-eye-conditions.md` with parameters, ranges, defaults, and a one-sentence "what this represents" note.
 - If the implementation deviated from a reference, note it under a "Notes" subsection.
 - If this condition was not in the original roadmap, append a checked-off line to `dev-docs/07-roadmap.md` under a "Post-roadmap additions" section (create the section if it doesn't exist).

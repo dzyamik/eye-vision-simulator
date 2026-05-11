@@ -41,7 +41,7 @@ For `PipelineManager.ts`:
 
 Produce a single markdown report. For each file:
 
-```
+````
 ### src/phaser/shaders/<file>.frag.glsl
 - ✅ Header consistent
 - ✅ No dead uniforms
@@ -51,7 +51,8 @@ Produce a single markdown report. For each file:
 Suggested patch:
 ```glsl
 <diff>
-```
+````
+
 ```
 
 At the end, give a **prioritized fix list**:
@@ -64,3 +65,4 @@ At the end, give a **prioritized fix list**:
 - **Do not edit any file during the audit.** Produce the report only.
 - **Do not suggest rewrites just because you would have done it differently.** Flag actual defects.
 - **If a shader matches the reference in `dev-docs/04-shaders-reference.md` and the reference is itself wrong**, flag both — but separately.
+```

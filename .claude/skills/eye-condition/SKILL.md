@@ -54,6 +54,7 @@ If the condition uses a fixed matrix/array (like color vision), also add that as
 Create `src/components/sidebar/panels/<Name>Panel.vue`. Use the `vue-component` skill conventions.
 
 The panel:
+
 - Takes an `eye: 'left' | 'right'` prop.
 - Renders a `<ConditionPanel>` with the toggle, title, and sliders for each parameter.
 - Each slider is a `<RangeInput>` bound to a writable computed pointing at the store.
@@ -138,19 +139,19 @@ After all 6 steps:
 
 ## Pitfalls specific to this workflow
 
-| Pitfall | Fix |
-|---|---|
-| Forgot to add to `createDefaultEyeSettings` | Toggling the condition crashes with undefined access. Always update both the type and the factory. |
-| Pipeline added to manager but not registered with Phaser | The effect doesn't render. Scene's `create()` needs `this.renderer.pipelines.addPostPipeline('<Name>Pipeline', <Name>Pipeline)`. |
-| Wrong stacking order | Cataract applied after a vignette looks wrong; color matrix applied after blur looks wrong. Refer to the order in `03-eye-conditions.md`. |
-| Slider doesn't update the view | Did you remember to call `syncFromStore` from the watcher, or wire the new condition into the existing watcher's deep watch? |
-| Build fails on the GLSL import | Vite needs `?raw`: `import fragShader from '.../<name>.frag.glsl?raw'`. Also check that `.glsl` is in `assetsInclude` in `vite.config.ts`. |
+| Pitfall                                                  | Fix                                                                                                                                        |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Forgot to add to `createDefaultEyeSettings`              | Toggling the condition crashes with undefined access. Always update both the type and the factory.                                         |
+| Pipeline added to manager but not registered with Phaser | The effect doesn't render. Scene's `create()` needs `this.renderer.pipelines.addPostPipeline('<Name>Pipeline', <Name>Pipeline)`.           |
+| Wrong stacking order                                     | Cataract applied after a vignette looks wrong; color matrix applied after blur looks wrong. Refer to the order in `03-eye-conditions.md`.  |
+| Slider doesn't update the view                           | Did you remember to call `syncFromStore` from the watcher, or wire the new condition into the existing watcher's deep watch?               |
+| Build fails on the GLSL import                           | Vite needs `?raw`: `import fragShader from '.../<name>.frag.glsl?raw'`. Also check that `.glsl` is in `assetsInclude` in `vite.config.ts`. |
 
 ## When NOT to add a new condition
 
 - If it's a variant of an existing condition (e.g. "moderate myopia" — just use the strength slider).
 - If it would be better as a built-in preset combining existing conditions.
 - If it doesn't have a visual representation we can plausibly simulate (e.g. "fatigue" — out of scope).
-- If the user is asking for an *option* on an existing condition (add a parameter to the existing one instead).
+- If the user is asking for an _option_ on an existing condition (add a parameter to the existing one instead).
 
 If in doubt, ask the user before doing all six steps.

@@ -29,19 +29,19 @@ If a step is ambiguous, ask before guessing.
 
 All specification documents are in [`dev-docs/`](./dev-docs/). Read them in this order on your first session:
 
-| File | What's in it |
-|---|---|
-| [`00-overview.md`](./dev-docs/00-overview.md) | High-level project goals and constraints |
-| [`01-architecture.md`](./dev-docs/01-architecture.md) | Modules, data flow, Vue↔Phaser bridge |
-| [`02-tech-stack.md`](./dev-docs/02-tech-stack.md) | Library choices and why |
-| [`03-eye-conditions.md`](./dev-docs/03-eye-conditions.md) | Each condition's parameters and meaning |
-| [`04-shaders-reference.md`](./dev-docs/04-shaders-reference.md) | GLSL implementations and matrices |
-| [`05-ui-ux-design.md`](./dev-docs/05-ui-ux-design.md) | Component layout, interactions, presets |
-| [`06-state-management.md`](./dev-docs/06-state-management.md) | Pinia store shapes |
-| [`07-roadmap.md`](./dev-docs/07-roadmap.md) | The plan you execute step-by-step |
-| [`08-coding-standards.md`](./dev-docs/08-coding-standards.md) | Code style, naming, file layout |
-| [`09-mcp-and-tools.md`](./dev-docs/09-mcp-and-tools.md) | Recommended MCP servers and Claude Code skills |
-| [`10-initial-prompt.md`](./dev-docs/10-initial-prompt.md) | The prompt the user opens with |
+| File                                                            | What's in it                                   |
+| --------------------------------------------------------------- | ---------------------------------------------- |
+| [`00-overview.md`](./dev-docs/00-overview.md)                   | High-level project goals and constraints       |
+| [`01-architecture.md`](./dev-docs/01-architecture.md)           | Modules, data flow, Vue↔Phaser bridge          |
+| [`02-tech-stack.md`](./dev-docs/02-tech-stack.md)               | Library choices and why                        |
+| [`03-eye-conditions.md`](./dev-docs/03-eye-conditions.md)       | Each condition's parameters and meaning        |
+| [`04-shaders-reference.md`](./dev-docs/04-shaders-reference.md) | GLSL implementations and matrices              |
+| [`05-ui-ux-design.md`](./dev-docs/05-ui-ux-design.md)           | Component layout, interactions, presets        |
+| [`06-state-management.md`](./dev-docs/06-state-management.md)   | Pinia store shapes                             |
+| [`07-roadmap.md`](./dev-docs/07-roadmap.md)                     | The plan you execute step-by-step              |
+| [`08-coding-standards.md`](./dev-docs/08-coding-standards.md)   | Code style, naming, file layout                |
+| [`09-mcp-and-tools.md`](./dev-docs/09-mcp-and-tools.md)         | Recommended MCP servers and Claude Code skills |
+| [`10-initial-prompt.md`](./dev-docs/10-initial-prompt.md)       | The prompt the user opens with                 |
 
 ## 4. Conventions
 

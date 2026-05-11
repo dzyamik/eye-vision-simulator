@@ -15,6 +15,7 @@ This is the prompt to paste into Claude Code when you start the project. Everyth
 > 3. Stop after completing 1.1 and its acceptance criteria. Show me what's on disk, run `npm run dev` if it makes sense, and wait for me to say "next" before continuing.
 >
 > Rules:
+>
 > - Don't skip ahead in the roadmap. One step at a time, with my "next" between each.
 > - If a step is ambiguous, ask before guessing.
 > - Follow `dev-docs/08-coding-standards.md` from the first file you touch.

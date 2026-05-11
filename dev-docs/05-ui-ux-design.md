@@ -106,6 +106,7 @@ A collapsible section, default-collapsed except "Refractive errors" on first loa
 - Disabled-condition sliders are visible but greyed out and non-interactive.
 
 Special cases:
+
 - **Astigmatism:** axis slider is a circular dial in addition to a numeric input (0–180°). Lets users orient by feel.
 - **Color vision:** type is a `<select>`, severity is a slider.
 - **Cataract:** subtype is three radio buttons; clicking one updates all four sliders to the preset values (with a brief animation) but doesn't lock them.
@@ -191,14 +192,14 @@ Selecting a preset replaces current settings. A small "Modified" indicator appea
 
 ## Keyboard shortcuts (optional, ship if time permits)
 
-| Key | Action |
-|---|---|
-| `L` | Focus Left eye |
-| `R` | Focus Right eye |
-| `B` | Focus Both eyes |
-| `Space` | Toggle the bottom view between "current settings" and "no effects" (compare on/off) |
-| `1`–`9` | Toggle conditions 1–9 in the current group |
-| `Ctrl/Cmd+Z` | Undo last parameter change |
+| Key          | Action                                                                              |
+| ------------ | ----------------------------------------------------------------------------------- |
+| `L`          | Focus Left eye                                                                      |
+| `R`          | Focus Right eye                                                                     |
+| `B`          | Focus Both eyes                                                                     |
+| `Space`      | Toggle the bottom view between "current settings" and "no effects" (compare on/off) |
+| `1`–`9`      | Toggle conditions 1–9 in the current group                                          |
+| `Ctrl/Cmd+Z` | Undo last parameter change                                                          |
 
 Undo/redo is a stretch goal. If implemented, store the last 50 parameter mutations in a ring buffer in Pinia.
 
@@ -212,9 +213,9 @@ Undo/redo is a stretch goal. If implemented, store the last 50 parameter mutatio
 
 ## Empty / error states
 
-| State | Behavior |
-|---|---|
-| No image loaded yet | The viewer shows a centered "Drop an image here, or pick a sample →" message. The impaired view stays blank. |
-| WebGL unavailable | Replace the impaired view with a card explaining the limitation and linking to a browser-support page. Sidebar still works (no-op). |
-| Image loaded but pipelines not ready | Original visible, impaired shows a centered spinner. |
-| Mask painting on an empty canvas | Show faint grid lines so the user knows the canvas is "there". |
+| State                                | Behavior                                                                                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| No image loaded yet                  | The viewer shows a centered "Drop an image here, or pick a sample →" message. The impaired view stays blank.                        |
+| WebGL unavailable                    | Replace the impaired view with a card explaining the limitation and linking to a browser-support page. Sidebar still works (no-op). |
+| Image loaded but pipelines not ready | Original visible, impaired shows a centered spinner.                                                                                |
+| Mask painting on an empty canvas     | Show faint grid lines so the user knows the canvas is "there".                                                                      |

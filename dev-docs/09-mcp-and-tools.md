@@ -8,11 +8,11 @@ Custom skills live under `.claude/skills/`. They're auto-discovered by Claude Co
 
 ### Skills included
 
-| Skill | When it fires | What it does |
-|---|---|---|
-| `shader-development` | Writing or modifying GLSL shaders, debugging visual output, adding a new `PostFXPipeline`. | Loads the relevant chunks of `04-shaders-reference.md`, the Phaser PostFX docs, and a checklist for shader work (sRGB handling, two-pass setup, uniform updates). |
-| `vue-component` | Creating or refactoring a Vue 3 component. | Loads the conventions from `08-coding-standards.md`, the typed-defineProps pattern, and the layout primitives. |
-| `eye-condition` | Adding a new condition end-to-end (type + store field + sidebar panel + pipeline + shader). | Walks through the 6-step checklist: type → defaults → ranges → UI panel → pipeline → wire-up. |
+| Skill                | When it fires                                                                               | What it does                                                                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shader-development` | Writing or modifying GLSL shaders, debugging visual output, adding a new `PostFXPipeline`.  | Loads the relevant chunks of `04-shaders-reference.md`, the Phaser PostFX docs, and a checklist for shader work (sRGB handling, two-pass setup, uniform updates). |
+| `vue-component`      | Creating or refactoring a Vue 3 component.                                                  | Loads the conventions from `08-coding-standards.md`, the typed-defineProps pattern, and the layout primitives.                                                    |
+| `eye-condition`      | Adding a new condition end-to-end (type + store field + sidebar panel + pipeline + shader). | Walks through the 6-step checklist: type → defaults → ranges → UI panel → pipeline → wire-up.                                                                     |
 
 The skill files themselves are the canonical reference; check `.claude/skills/*/SKILL.md`.
 
@@ -20,20 +20,22 @@ The skill files themselves are the canonical reference; check `.claude/skills/*/
 
 Custom commands live under `.claude/commands/`. Each is a markdown file; the filename (without extension) is the command name.
 
-| Command | Purpose |
-|---|---|
-| `/next-step` | Find the first unchecked step in `07-roadmap.md` and execute it according to CLAUDE.md's "How to work" section. |
-| `/implement-condition <name>` | Walk through adding a brand-new condition (use the `eye-condition` skill). |
-| `/audit-shaders` | Review all `.frag.glsl` files for the common issues listed in `04-shaders-reference.md` (precision, sRGB, validation). |
+| Command                       | Purpose                                                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `/next-step`                  | Find the first unchecked step in `07-roadmap.md` and execute it according to CLAUDE.md's "How to work" section.        |
+| `/implement-condition <name>` | Walk through adding a brand-new condition (use the `eye-condition` skill).                                             |
+| `/audit-shaders`              | Review all `.frag.glsl` files for the common issues listed in `04-shaders-reference.md` (precision, sRGB, validation). |
 
 ## MCP servers — recommended
 
 [Model Context Protocol](https://docs.claude.com/en/docs/agents-and-tools/mcp) servers give Claude Code extra abilities. None are required, but these pay off on this project:
 
 ### Filesystem MCP
+
 The default — Claude Code has read/write access to the project directory anyway. No setup needed.
 
 ### GitHub MCP (recommended)
+
 If you want Claude Code to open issues, manage labels, or fetch information about the repo state.
 
 ```bash
@@ -41,11 +43,13 @@ claude mcp add github -- npx -y @modelcontextprotocol/server-github
 ```
 
 Set `GITHUB_PERSONAL_ACCESS_TOKEN` in your environment. Use cases here:
+
 - Pre-populate issues from the v1.1 backlog in `07-roadmap.md`.
 - Auto-create issues for each unchecked roadmap step (optional workflow).
 - Read repo settings to verify the GH Pages base path matches what's in `vite.config.ts`.
 
 ### Fetch MCP (recommended for shader work)
+
 Lets Claude Code fetch external URLs directly (Phaser docs, the references in `03-eye-conditions.md`).
 
 ```bash
@@ -55,6 +59,7 @@ claude mcp add fetch -- npx -y @modelcontextprotocol/server-fetch
 Useful when iterating on a shader where the reference is online. Without it, Claude works from training-data knowledge or doc snippets you paste in.
 
 ### Puppeteer / Playwright MCP (optional)
+
 For visual regression testing once the app is partially built. Not needed for v1 but useful if you want screenshots in the README or to spot-check that all conditions render.
 
 ```bash
@@ -71,11 +76,11 @@ claude mcp add playwright -- npx -y @playwright/mcp@latest
 
 These help humans contributing alongside Claude Code:
 
-| Extension | Why |
-|---|---|
-| Volar (Vue Language Features) | Vue 3 + TS support in the editor. |
+| Extension                      | Why                                                    |
+| ------------------------------ | ------------------------------------------------------ |
+| Volar (Vue Language Features)  | Vue 3 + TS support in the editor.                      |
 | WebGL GLSL Editor (or similar) | GLSL syntax highlighting for `.glsl` and `.frag.glsl`. |
-| ESLint, Prettier | Lint/format integration. |
+| ESLint, Prettier               | Lint/format integration.                               |
 
 ## Node and npm
 
@@ -127,7 +132,7 @@ Add these to `package.json` scripts once the project is scaffolded:
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.vue",
     "format": "prettier --write .",
-    "type-check": "vue-tsc --noEmit"
-  }
+    "type-check": "vue-tsc --noEmit",
+  },
 }
 ```

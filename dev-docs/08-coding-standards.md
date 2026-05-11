@@ -13,7 +13,12 @@ The point of these standards is consistency across many small Claude Code sessio
 
 ```ts
 // good
-export interface RangeSpec { min: number; max: number; default: number; step?: number; }
+export interface RangeSpec {
+  min: number;
+  max: number;
+  default: number;
+  step?: number;
+}
 export const MYOPIA_RANGE: RangeSpec = { min: 0, max: 1, default: 0, step: 0.01 } as const;
 
 // bad
@@ -38,7 +43,9 @@ const props = defineProps<{ eye: 'left' | 'right' }>();
 const store = useEyeSettingsStore();
 const strength = computed<number>({
   get: () => store[props.eye].myopia.strength,
-  set: (v) => { store[props.eye].myopia.strength = v; },
+  set: (v) => {
+    store[props.eye].myopia.strength = v;
+  },
 });
 </script>
 
@@ -52,7 +59,7 @@ const strength = computed<number>({
 - Setup-style stores (factory function), not options style — better TS inference.
 - One store per domain. Don't pile unrelated state into one big store.
 - Actions go in the store; components call them.
-- No store imports inside other store *file modules* unless absolutely necessary (call them at the top of an action instead).
+- No store imports inside other store _file modules_ unless absolutely necessary (call them at the top of an action instead).
 
 ## CSS
 
@@ -79,15 +86,15 @@ const strength = computed<number>({
 
 ## File and naming conventions
 
-| Thing | Convention | Example |
-|---|---|---|
-| Component | `PascalCase.vue` | `ConditionPanel.vue` |
-| Composable | `useThing.ts`, default export named `useThing` | `usePhaser.ts` |
-| Store | `src/stores/thing.ts`, exports `useThingStore` | `eyeSettings.ts` |
-| Type file | `src/types/thing.ts` | `eyeSettings.ts` |
-| Constants | `src/constants/thing.ts` | `colorMatrices.ts` |
-| Shader (raw GLSL) | `<name>.frag.glsl` | `blur.frag.glsl` |
-| Phaser pipeline | `<Condition>Pipeline.ts` | `BlurPipeline.ts` |
+| Thing             | Convention                                     | Example              |
+| ----------------- | ---------------------------------------------- | -------------------- |
+| Component         | `PascalCase.vue`                               | `ConditionPanel.vue` |
+| Composable        | `useThing.ts`, default export named `useThing` | `usePhaser.ts`       |
+| Store             | `src/stores/thing.ts`, exports `useThingStore` | `eyeSettings.ts`     |
+| Type file         | `src/types/thing.ts`                           | `eyeSettings.ts`     |
+| Constants         | `src/constants/thing.ts`                       | `colorMatrices.ts`   |
+| Shader (raw GLSL) | `<name>.frag.glsl`                             | `blur.frag.glsl`     |
+| Phaser pipeline   | `<Condition>Pipeline.ts`                       | `BlurPipeline.ts`    |
 
 ## Imports
 

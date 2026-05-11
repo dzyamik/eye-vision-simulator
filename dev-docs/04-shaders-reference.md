@@ -122,14 +122,14 @@ These are the widely-used Machado-derived matrices for full-strength dichromacy.
 ```ts
 // src/constants/colorMatrices.ts
 export const COLOR_MATRICES = {
-  normal:        [1, 0, 0,  0, 1, 0,  0, 0, 1],
-  protanopia:    [0.567, 0.433, 0.000,  0.558, 0.442, 0.000,  0.000, 0.242, 0.758],
-  deuteranopia:  [0.625, 0.375, 0.000,  0.700, 0.300, 0.000,  0.000, 0.300, 0.700],
-  tritanopia:    [0.950, 0.050, 0.000,  0.000, 0.433, 0.567,  0.000, 0.475, 0.525],
-  protanomaly:   [0.817, 0.183, 0.000,  0.333, 0.667, 0.000,  0.000, 0.125, 0.875],
-  deuteranomaly: [0.800, 0.200, 0.000,  0.258, 0.742, 0.000,  0.000, 0.142, 0.858],
-  tritanomaly:   [0.967, 0.033, 0.000,  0.000, 0.733, 0.267,  0.000, 0.183, 0.817],
-  achromatopsia: [0.299, 0.587, 0.114,  0.299, 0.587, 0.114,  0.299, 0.587, 0.114],
+  normal: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+  protanopia: [0.567, 0.433, 0.0, 0.558, 0.442, 0.0, 0.0, 0.242, 0.758],
+  deuteranopia: [0.625, 0.375, 0.0, 0.7, 0.3, 0.0, 0.0, 0.3, 0.7],
+  tritanopia: [0.95, 0.05, 0.0, 0.0, 0.433, 0.567, 0.0, 0.475, 0.525],
+  protanomaly: [0.817, 0.183, 0.0, 0.333, 0.667, 0.0, 0.0, 0.125, 0.875],
+  deuteranomaly: [0.8, 0.2, 0.0, 0.258, 0.742, 0.0, 0.0, 0.142, 0.858],
+  tritanomaly: [0.967, 0.033, 0.0, 0.0, 0.733, 0.267, 0.0, 0.183, 0.817],
+  achromatopsia: [0.299, 0.587, 0.114, 0.299, 0.587, 0.114, 0.299, 0.587, 0.114],
 } as const;
 ```
 
@@ -177,11 +177,11 @@ A separate small Gaussian blur applied **before** this pipeline accounts for the
 
 The subtype selector (nuclear/cortical/subcapsular) in the UI sets the four parameters to preset combinations:
 
-| Subtype | yellowing | cloudiness | brightnessLoss | glare |
-|---|---|---|---|---|
-| nuclear | 0.7 | 0.3 | 0.4 | 0.1 |
-| cortical | 0.2 | 0.6 | 0.3 | 0.5 |
-| subcapsular | 0.1 | 0.3 | 0.2 | 0.9 |
+| Subtype     | yellowing | cloudiness | brightnessLoss | glare |
+| ----------- | --------- | ---------- | -------------- | ----- |
+| nuclear     | 0.7       | 0.3        | 0.4            | 0.1   |
+| cortical    | 0.2       | 0.6        | 0.3            | 0.5   |
+| subcapsular | 0.1       | 0.3        | 0.2            | 0.9   |
 
 These are starting points; the user can drag any slider after.
 
@@ -309,7 +309,8 @@ Don't use a shader for floaters — use Phaser sprites. Render a few small dark 
 
 ```ts
 // pseudocode
-this.scene.add.image(x, y, 'floaterTexture')
+this.scene.add
+  .image(x, y, 'floaterTexture')
   .setAlpha(opacity)
   .setBlendMode(Phaser.BlendModes.MULTIPLY);
 ```

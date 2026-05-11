@@ -128,14 +128,14 @@ Tick the relevant box in `dev-docs/07-roadmap.md`. If you discovered something w
 
 ## Common pitfalls
 
-| Symptom | Likely cause |
-|---|---|
-| Black image | Forgot to declare a uniform or it's not being set; or `precision mediump float;` is missing. |
-| Image visible but no effect | `enabled` not propagating; uniform not actually updated in `onPreRender`; pipeline not attached to the camera. |
-| Visible band/seam at edges | Shader is sampling outside [0,1] UV without clamping. Use `clamp(uv, 0.0, 1.0)` or fix the kernel offset math. |
-| Color shifts in unexpected places | Forgot the sRGB → linear → operate → linear → sRGB sandwich for any color-mixing shader. |
-| Slider drag is jerky | Too many uniform updates per frame; coalesce with `requestAnimationFrame`. |
-| Wrong color blindness output | Matrix transposed (row vs column-major mismatch). Try transposing before calling Brettel-Viénot the wrong matrix. |
+| Symptom                           | Likely cause                                                                                                      |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Black image                       | Forgot to declare a uniform or it's not being set; or `precision mediump float;` is missing.                      |
+| Image visible but no effect       | `enabled` not propagating; uniform not actually updated in `onPreRender`; pipeline not attached to the camera.    |
+| Visible band/seam at edges        | Shader is sampling outside [0,1] UV without clamping. Use `clamp(uv, 0.0, 1.0)` or fix the kernel offset math.    |
+| Color shifts in unexpected places | Forgot the sRGB → linear → operate → linear → sRGB sandwich for any color-mixing shader.                          |
+| Slider drag is jerky              | Too many uniform updates per frame; coalesce with `requestAnimationFrame`.                                        |
+| Wrong color blindness output      | Matrix transposed (row vs column-major mismatch). Try transposing before calling Brettel-Viénot the wrong matrix. |
 
 ## Phaser 4 (filters) vs Phaser 3 (pipelines)
 

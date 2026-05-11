@@ -39,14 +39,14 @@ Use the **eye selector** in the sidebar to toggle which eye's settings you're ed
 
 ## Tech stack
 
-| Layer | Choice |
-|---|---|
-| Language | TypeScript |
-| Build tool | Vite (output to `docs/` for GitHub Pages) |
-| UI framework | Vue 3 (Composition API, `<script setup>`) |
-| State | Pinia |
-| Rendering | Phaser 3 with custom `PostFXPipeline` shaders |
-| Styling | Plain CSS / CSS variables (no Tailwind — keep deps light) |
+| Layer        | Choice                                                    |
+| ------------ | --------------------------------------------------------- |
+| Language     | TypeScript                                                |
+| Build tool   | Vite (output to `docs/` for GitHub Pages)                 |
+| UI framework | Vue 3 (Composition API, `<script setup>`)                 |
+| State        | Pinia                                                     |
+| Rendering    | Phaser 3 with custom `PostFXPipeline` shaders             |
+| Styling      | Plain CSS / CSS variables (no Tailwind — keep deps light) |
 
 See [`dev-docs/02-tech-stack.md`](./dev-docs/02-tech-stack.md) for the full rationale.
 

@@ -21,19 +21,42 @@ export type CataractSubtype = 'nuclear' | 'cortical' | 'subcapsular';
 export type MaskEffect = 'darken' | 'blur' | 'desaturate';
 
 export interface EyeSettings {
-  myopia:               { enabled: boolean; strength: number };           // strength 0..1
-  hyperopia:            { enabled: boolean; strength: number };
-  presbyopia:           { enabled: boolean; strength: number };
-  astigmatism:          { enabled: boolean; magnitude: number; axis: number }; // axis 0..180
-  colorVision:          { enabled: boolean; type: ColorVisionType; severity: number };
-  cataract:             { enabled: boolean; subtype: CataractSubtype; cloudiness: number; yellowing: number; brightnessLoss: number; glare: number };
-  glaucoma:             { enabled: boolean; innerRadius: number; feather: number; severity: number };
-  amd:                  { enabled: boolean; scotomaRadius: number; falloff: number; distortion: number };
-  diabeticRetinopathy:  { enabled: boolean; spotCount: number; spotSize: number; severity: number };
-  retinitisPigmentosa:  { enabled: boolean; tunnelRadius: number; feather: number; brightnessLoss: number };
-  floaters:             { enabled: boolean; count: number; size: number; opacity: number; animate: boolean };
-  migraineAura:         { enabled: boolean; radius: number; positionX: number; positionY: number; animate: boolean };
-  customMask:           { enabled: boolean; effect: MaskEffect; intensity: number; maskData: ImageData | null };
+  myopia: { enabled: boolean; strength: number }; // strength 0..1
+  hyperopia: { enabled: boolean; strength: number };
+  presbyopia: { enabled: boolean; strength: number };
+  astigmatism: { enabled: boolean; magnitude: number; axis: number }; // axis 0..180
+  colorVision: { enabled: boolean; type: ColorVisionType; severity: number };
+  cataract: {
+    enabled: boolean;
+    subtype: CataractSubtype;
+    cloudiness: number;
+    yellowing: number;
+    brightnessLoss: number;
+    glare: number;
+  };
+  glaucoma: { enabled: boolean; innerRadius: number; feather: number; severity: number };
+  amd: { enabled: boolean; scotomaRadius: number; falloff: number; distortion: number };
+  diabeticRetinopathy: { enabled: boolean; spotCount: number; spotSize: number; severity: number };
+  retinitisPigmentosa: {
+    enabled: boolean;
+    tunnelRadius: number;
+    feather: number;
+    brightnessLoss: number;
+  };
+  floaters: { enabled: boolean; count: number; size: number; opacity: number; animate: boolean };
+  migraineAura: {
+    enabled: boolean;
+    radius: number;
+    positionX: number;
+    positionY: number;
+    animate: boolean;
+  };
+  customMask: {
+    enabled: boolean;
+    effect: MaskEffect;
+    intensity: number;
+    maskData: ImageData | null;
+  };
 }
 
 export type ConditionKey = keyof EyeSettings;
@@ -45,19 +68,26 @@ A factory returns clean defaults:
 // src/types/eyeSettings.ts (cont'd)
 export function createDefaultEyeSettings(): EyeSettings {
   return {
-    myopia:              { enabled: false, strength: 0 },
-    hyperopia:           { enabled: false, strength: 0 },
-    presbyopia:          { enabled: false, strength: 0 },
-    astigmatism:         { enabled: false, magnitude: 0, axis: 0 },
-    colorVision:         { enabled: false, type: 'normal', severity: 1 },
-    cataract:            { enabled: false, subtype: 'nuclear', cloudiness: 0, yellowing: 0, brightnessLoss: 0, glare: 0 },
-    glaucoma:            { enabled: false, innerRadius: 0.7, feather: 0.1, severity: 1 },
-    amd:                 { enabled: false, scotomaRadius: 0, falloff: 0.1, distortion: 0 },
+    myopia: { enabled: false, strength: 0 },
+    hyperopia: { enabled: false, strength: 0 },
+    presbyopia: { enabled: false, strength: 0 },
+    astigmatism: { enabled: false, magnitude: 0, axis: 0 },
+    colorVision: { enabled: false, type: 'normal', severity: 1 },
+    cataract: {
+      enabled: false,
+      subtype: 'nuclear',
+      cloudiness: 0,
+      yellowing: 0,
+      brightnessLoss: 0,
+      glare: 0,
+    },
+    glaucoma: { enabled: false, innerRadius: 0.7, feather: 0.1, severity: 1 },
+    amd: { enabled: false, scotomaRadius: 0, falloff: 0.1, distortion: 0 },
     diabeticRetinopathy: { enabled: false, spotCount: 0, spotSize: 0.05, severity: 0 },
     retinitisPigmentosa: { enabled: false, tunnelRadius: 0.3, feather: 0.05, brightnessLoss: 0.3 },
-    floaters:            { enabled: false, count: 0, size: 0.02, opacity: 0.5, animate: true },
-    migraineAura:        { enabled: false, radius: 0.15, positionX: 0.5, positionY: 0.5, animate: true },
-    customMask:          { enabled: false, effect: 'darken', intensity: 1, maskData: null },
+    floaters: { enabled: false, count: 0, size: 0.02, opacity: 0.5, animate: true },
+    migraineAura: { enabled: false, radius: 0.15, positionX: 0.5, positionY: 0.5, animate: true },
+    customMask: { enabled: false, effect: 'darken', intensity: 1, maskData: null },
   };
 }
 ```
@@ -75,7 +105,7 @@ import type { EyeSettings, ConditionKey } from '@/types/eyeSettings';
 import { createDefaultEyeSettings } from '@/types/eyeSettings';
 
 export const useEyeSettingsStore = defineStore('eyeSettings', () => {
-  const left  = ref<EyeSettings>(createDefaultEyeSettings());
+  const left = ref<EyeSettings>(createDefaultEyeSettings());
   const right = ref<EyeSettings>(createDefaultEyeSettings());
   const linked = ref<boolean>(false); // when true, edits apply to both
 
@@ -93,12 +123,10 @@ export const useEyeSettingsStore = defineStore('eyeSettings', () => {
     (to === 'left' ? left : right).value = structuredClone(src);
   }
 
-  const anyEnabled = computed(() =>
-    (eye: 'left' | 'right') => {
-      const s = eye === 'left' ? left.value : right.value;
-      return Object.values(s).some((c) => (c as { enabled: boolean }).enabled);
-    },
-  );
+  const anyEnabled = computed(() => (eye: 'left' | 'right') => {
+    const s = eye === 'left' ? left.value : right.value;
+    return Object.values(s).some((c) => (c as { enabled: boolean }).enabled);
+  });
 
   return { left, right, linked, resetEye, resetAll, copy, anyEnabled };
 });
@@ -114,7 +142,7 @@ export type ViewMode = 'both' | 'left' | 'right' | 'split';
 
 export const useViewSettingsStore = defineStore('viewSettings', () => {
   const activeEye = ref<ActiveEye>('both'); // what the sidebar is editing
-  const viewMode = ref<ViewMode>('both');    // what the impaired view renders
+  const viewMode = ref<ViewMode>('both'); // what the impaired view renders
   return { activeEye, viewMode };
 });
 ```
@@ -125,7 +153,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
 
 ```ts
 export interface ImageSource {
-  src: string;            // data URL or public path
+  src: string; // data URL or public path
   width: number;
   height: number;
   filename?: string;
@@ -158,7 +186,7 @@ Helpers (`readAsDataURL`, `getImageDims`) live in `src/utils/image.ts`.
 export interface Preset {
   id: string;
   name: string;
-  left: EyeSettings;   // with mask serialized as base64 PNG inside maskData
+  left: EyeSettings; // with mask serialized as base64 PNG inside maskData
   right: EyeSettings;
   builtIn?: boolean;
 }
@@ -172,9 +200,15 @@ export const usePresetsStore = defineStore('presets', () => {
     eye.left = structuredClone(preset.left);
     eye.right = structuredClone(preset.right);
   }
-  function saveCurrent(name: string): Preset { /* ... */ }
-  function exportJson(): string { /* ... */ }
-  function importJson(text: string): void { /* ... */ }
+  function saveCurrent(name: string): Preset {
+    /* ... */
+  }
+  function exportJson(): string {
+    /* ... */
+  }
+  function importJson(text: string): void {
+    /* ... */
+  }
 
   return { builtIn, userPresets, load, saveCurrent, exportJson, importJson };
 });
@@ -189,11 +223,11 @@ Mask serialization for export: when saving, walk each eye's `customMask.maskData
 ```ts
 const strength = computed<number>({
   get: () => store.left.myopia.strength,
-  set: (v) => store.left.myopia.strength = clamp(v, 0, 1),
+  set: (v) => (store.left.myopia.strength = clamp(v, 0, 1)),
 });
 ```
 
-- **Linked mode** (`useEyeSettingsStore.linked`): when true, the writable computed sets *both* eyes. Keep this logic in a small composable `useEyeParam(eye, condition, key)` so components don't repeat the pattern.
+- **Linked mode** (`useEyeSettingsStore.linked`): when true, the writable computed sets _both_ eyes. Keep this logic in a small composable `useEyeParam(eye, condition, key)` so components don't repeat the pattern.
 
 - **Bridge watchers** in `usePhaser.ts`:
 
@@ -201,7 +235,7 @@ const strength = computed<number>({
 watch(
   () => [store.left, store.right, view.viewMode],
   () => pipelineManager.syncFromStore(),
-  { deep: true, flush: 'post' }
+  { deep: true, flush: 'post' },
 );
 ```
 

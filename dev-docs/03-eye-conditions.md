@@ -6,21 +6,21 @@ This is the canonical list of conditions the simulator supports, with the parame
 
 ## Condition table — quick reference
 
-| ID | Display name | Group | Key parameters |
-|---|---|---|---|
-| `myopia` | Myopia (nearsightedness) | Refractive | strength |
-| `hyperopia` | Hyperopia (farsightedness) | Refractive | strength |
-| `astigmatism` | Astigmatism | Refractive | magnitude, axis |
-| `presbyopia` | Presbyopia | Refractive | strength |
-| `colorVision` | Color vision deficiency | Color | type, severity |
-| `cataract` | Cataract | Lens | subtype, cloudiness, yellowing, glare |
-| `glaucoma` | Glaucoma (peripheral loss) | Field loss | innerRadius, feather, severity |
-| `amd` | Age-related macular degeneration | Field loss | scotomaRadius, distortion, falloff |
-| `diabeticRetinopathy` | Diabetic retinopathy | Field loss | spotCount, spotSize, severity |
-| `retinitisPigmentosa` | Retinitis pigmentosa | Field loss | tunnelRadius, brightnessLoss |
-| `floaters` | Floaters | Overlay | count, size, opacity |
-| `migraineAura` | Migraine aura | Overlay | radius, position, animationSpeed |
-| `customMask` | Custom mask | Custom | maskTexture, effect |
+| ID                    | Display name                     | Group      | Key parameters                        |
+| --------------------- | -------------------------------- | ---------- | ------------------------------------- |
+| `myopia`              | Myopia (nearsightedness)         | Refractive | strength                              |
+| `hyperopia`           | Hyperopia (farsightedness)       | Refractive | strength                              |
+| `astigmatism`         | Astigmatism                      | Refractive | magnitude, axis                       |
+| `presbyopia`          | Presbyopia                       | Refractive | strength                              |
+| `colorVision`         | Color vision deficiency          | Color      | type, severity                        |
+| `cataract`            | Cataract                         | Lens       | subtype, cloudiness, yellowing, glare |
+| `glaucoma`            | Glaucoma (peripheral loss)       | Field loss | innerRadius, feather, severity        |
+| `amd`                 | Age-related macular degeneration | Field loss | scotomaRadius, distortion, falloff    |
+| `diabeticRetinopathy` | Diabetic retinopathy             | Field loss | spotCount, spotSize, severity         |
+| `retinitisPigmentosa` | Retinitis pigmentosa             | Field loss | tunnelRadius, brightnessLoss          |
+| `floaters`            | Floaters                         | Overlay    | count, size, opacity                  |
+| `migraineAura`        | Migraine aura                    | Overlay    | radius, position, animationSpeed      |
+| `customMask`          | Custom mask                      | Custom     | maskTexture, effect                   |
 
 Every condition also has an `enabled: boolean`. When `false`, the pipeline is detached from the camera entirely.
 
@@ -34,10 +34,10 @@ The eye is too long or the cornea too curved; distant objects appear blurred whi
 
 **Visualization:** uniform Gaussian-style blur.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `strength` | 0.0 – 1.0 | 0.0 | 0 = sharp; 1 = severe blur (~ -6 D and beyond). |
+| Param      | Range     | Default | Meaning                                         |
+| ---------- | --------- | ------- | ----------------------------------------------- |
+| `enabled`  | bool      | false   |                                                 |
+| `strength` | 0.0 – 1.0 | 0.0     | 0 = sharp; 1 = severe blur (~ -6 D and beyond). |
 
 **Implementation notes:** Use a 2-pass separable Gaussian for performance. The blur radius (in pixels) scales with `strength * maxBlurPx` where `maxBlurPx` is e.g. 24. Anti-clamping at the edges via texture-clamp sampling.
 
@@ -45,20 +45,20 @@ The eye is too long or the cornea too curved; distant objects appear blurred whi
 
 Eye too short / lens too flat; near objects appear blurred, distance ok. Visually, the simulator can't really tell the user's eye-to-screen distance, so we treat it as the same blur effect as myopia but flag it differently in the UI for educational clarity.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `strength` | 0.0 – 1.0 | 0.0 | Same as myopia. |
+| Param      | Range     | Default | Meaning         |
+| ---------- | --------- | ------- | --------------- |
+| `enabled`  | bool      | false   |                 |
+| `strength` | 0.0 – 1.0 | 0.0     | Same as myopia. |
 
 ### Astigmatism
 
 The cornea is shaped more like a rugby ball than a sphere. Light focuses on multiple planes, causing direction-dependent blur. A vertically-oriented astigmatism blurs vertical lines more than horizontal, and vice versa.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `magnitude` | 0.0 – 1.0 | 0.0 | Strength of directional blur. |
-| `axis` | 0 – 180 (deg) | 0 | Axis along which blur is strongest. |
+| Param       | Range         | Default | Meaning                             |
+| ----------- | ------------- | ------- | ----------------------------------- |
+| `enabled`   | bool          | false   |                                     |
+| `magnitude` | 0.0 – 1.0     | 0.0     | Strength of directional blur.       |
+| `axis`      | 0 – 180 (deg) | 0       | Axis along which blur is strongest. |
 
 **Implementation:** directional Gaussian — kernel weights stretched along the axis vector. A single-pass shader that samples along `vec2(cos(angle), sin(angle))` works fine for moderate radii.
 
@@ -66,10 +66,10 @@ The cornea is shaped more like a rugby ball than a sphere. Light focuses on mult
 
 Age-related stiffening of the lens; near focus declines. Same trick as hyperopia — show a uniform blur with a different label.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `strength` | 0.0 – 1.0 | 0.0 | |
+| Param      | Range     | Default | Meaning |
+| ---------- | --------- | ------- | ------- |
+| `enabled`  | bool      | false   |         |
+| `strength` | 0.0 – 1.0 | 0.0     |         |
 
 ---
 
@@ -77,15 +77,16 @@ Age-related stiffening of the lens; near focus declines. Same trick as hyperopia
 
 A single condition with a type-selector, applied as a 3×3 matrix in linear RGB (after sRGB→linear and before linear→sRGB).
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `type` | enum | `normal` | `protanopia`, `deuteranopia`, `tritanopia`, `achromatopsia`, `protanomaly`, `deuteranomaly`, `tritanomaly` |
-| `severity` | 0.0 – 1.0 | 1.0 | Interpolates between identity and the full deficiency matrix. |
+| Param      | Range     | Default  | Meaning                                                                                                    |
+| ---------- | --------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `enabled`  | bool      | false    |                                                                                                            |
+| `type`     | enum      | `normal` | `protanopia`, `deuteranopia`, `tritanopia`, `achromatopsia`, `protanomaly`, `deuteranomaly`, `tritanomaly` |
+| `severity` | 0.0 – 1.0 | 1.0      | Interpolates between identity and the full deficiency matrix.                                              |
 
 The actual matrices live in [`04-shaders-reference.md`](./04-shaders-reference.md). Use the Brettel/Viénot family for protan/deutan, and a published tritan matrix; for "anomaly" variants, the same matrix with `severity < 1`.
 
 **Population stats** (worth surfacing in UI tooltips, not used in code):
+
 - Deuteranomaly: ~5% of males
 - Protanomaly: ~1% of males
 - Tritanopia: ~0.01%
@@ -97,22 +98,22 @@ The actual matrices live in [`04-shaders-reference.md`](./04-shaders-reference.m
 
 Clouding of the lens. There are three common subtypes that look very different:
 
-| Subtype | Look |
-|---|---|
-| `nuclear` | Hardens and yellows the lens center. Image looks dim, slightly yellow-brown, blue desaturated, mildly blurred. |
-| `cortical` | Spoke-like opacities radiating from the periphery. Creates non-uniform haze and bad glare. |
-| `subcapsular` | Affects the back of the lens. Severe glare, halos around bright lights, near vision worse than distance. |
+| Subtype       | Look                                                                                                           |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| `nuclear`     | Hardens and yellows the lens center. Image looks dim, slightly yellow-brown, blue desaturated, mildly blurred. |
+| `cortical`    | Spoke-like opacities radiating from the periphery. Creates non-uniform haze and bad glare.                     |
+| `subcapsular` | Affects the back of the lens. Severe glare, halos around bright lights, near vision worse than distance.       |
 
 **Parameters (one set, modulated by subtype):**
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `subtype` | enum | `nuclear` | |
-| `cloudiness` | 0 – 1 | 0 | White-haze overlay opacity. |
-| `yellowing` | 0 – 1 | 0 | Shifts white point toward yellow, desaturates blues. |
-| `brightnessLoss` | 0 – 1 | 0 | Multiplicative dimming. |
-| `glare` | 0 – 1 | 0 | Bloom around highlights. |
+| Param            | Range | Default   | Meaning                                              |
+| ---------------- | ----- | --------- | ---------------------------------------------------- |
+| `enabled`        | bool  | false     |                                                      |
+| `subtype`        | enum  | `nuclear` |                                                      |
+| `cloudiness`     | 0 – 1 | 0         | White-haze overlay opacity.                          |
+| `yellowing`      | 0 – 1 | 0         | Shifts white point toward yellow, desaturates blues. |
+| `brightnessLoss` | 0 – 1 | 0         | Multiplicative dimming.                              |
+| `glare`          | 0 – 1 | 0         | Bloom around highlights.                             |
 
 When `subtype` is selected, the UI pre-sets the four parameters to typical values for that subtype but lets the user override.
 
@@ -122,12 +123,12 @@ When `subtype` is selected, the UI pre-sets the four parameters to typical value
 
 Damages the optic nerve; classically presents as **peripheral vision loss** progressing inward ("tunnel vision"). Real glaucoma is rarely a perfect circular vignette — it tends to start with arcuate scotomas in the upper or lower hemifield. v1 ships with a simple radial model; advanced users can use the custom mask for arcuate patterns.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `innerRadius` | 0 – 0.7 | 0.7 | Normalized radius (relative to half min(canvas dims)) inside which vision is preserved. |
-| `feather` | 0 – 0.3 | 0.1 | Width of the gradient from clear to dark. |
-| `severity` | 0 – 1 | 1.0 | How dark the periphery gets (1 = black, 0.3 = dim). |
+| Param         | Range   | Default | Meaning                                                                                 |
+| ------------- | ------- | ------- | --------------------------------------------------------------------------------------- |
+| `enabled`     | bool    | false   |                                                                                         |
+| `innerRadius` | 0 – 0.7 | 0.7     | Normalized radius (relative to half min(canvas dims)) inside which vision is preserved. |
+| `feather`     | 0 – 0.3 | 0.1     | Width of the gradient from clear to dark.                                               |
+| `severity`    | 0 – 1   | 1.0     | How dark the periphery gets (1 = black, 0.3 = dim).                                     |
 
 ---
 
@@ -138,12 +139,12 @@ Damages the macula → **central vision loss**. Two flavors:
 - **Dry AMD:** gradual blur and fade in the center.
 - **Wet AMD:** straight lines bend (metamorphopsia), often with a central scotoma.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `scotomaRadius` | 0 – 0.5 | 0 | Normalized radius of the dark central spot. |
-| `falloff` | 0 – 0.3 | 0.1 | Gradient softness around the scotoma. |
-| `distortion` | 0 – 1 | 0 | Adds a noise-based UV warp around the central area (the wavy effect). |
+| Param           | Range   | Default | Meaning                                                               |
+| --------------- | ------- | ------- | --------------------------------------------------------------------- |
+| `enabled`       | bool    | false   |                                                                       |
+| `scotomaRadius` | 0 – 0.5 | 0       | Normalized radius of the dark central spot.                           |
+| `falloff`       | 0 – 0.3 | 0.1     | Gradient softness around the scotoma.                                 |
+| `distortion`    | 0 – 1   | 0       | Adds a noise-based UV warp around the central area (the wavy effect). |
 
 ---
 
@@ -151,12 +152,12 @@ Damages the macula → **central vision loss**. Two flavors:
 
 Damages retinal blood vessels; creates patchy dark spots in the visual field plus general haziness.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `spotCount` | 0 – 40 | 0 | Number of dark spots. |
-| `spotSize` | 0.01 – 0.15 | 0.05 | Avg spot radius (normalized). |
-| `severity` | 0 – 1 | 0 | Overall opacity multiplier. |
+| Param       | Range       | Default | Meaning                       |
+| ----------- | ----------- | ------- | ----------------------------- |
+| `enabled`   | bool        | false   |                               |
+| `spotCount` | 0 – 40      | 0       | Number of dark spots.         |
+| `spotSize`  | 0.01 – 0.15 | 0.05    | Avg spot radius (normalized). |
+| `severity`  | 0 – 1       | 0       | Overall opacity multiplier.   |
 
 **Implementation:** generate `spotCount` pseudo-random `(x, y, r)` triplets in CPU on parameter change (seeded RNG so it's stable), upload as a uniform array (or texture for >32 spots). Shader does distance test per spot.
 
@@ -166,12 +167,12 @@ Damages retinal blood vessels; creates patchy dark spots in the visual field plu
 
 Genetic; severe peripheral loss + night blindness. Tunnel vision plus reduced overall brightness.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `tunnelRadius` | 0 – 0.5 | 0.3 | Smaller than glaucoma's typical range. |
-| `feather` | 0 – 0.2 | 0.05 | |
-| `brightnessLoss` | 0 – 0.7 | 0.3 | Multiplicative dimming inside the visible region too. |
+| Param            | Range   | Default | Meaning                                               |
+| ---------------- | ------- | ------- | ----------------------------------------------------- |
+| `enabled`        | bool    | false   |                                                       |
+| `tunnelRadius`   | 0 – 0.5 | 0.3     | Smaller than glaucoma's typical range.                |
+| `feather`        | 0 – 0.2 | 0.05    |                                                       |
+| `brightnessLoss` | 0 – 0.7 | 0.3     | Multiplicative dimming inside the visible region too. |
 
 Essentially a more severe glaucoma + a brightness term. Implemented separately because users will look for it by name.
 
@@ -181,13 +182,13 @@ Essentially a more severe glaucoma + a brightness term. Implemented separately b
 
 Specks/strands inside the vitreous; cast moving shadows.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `count` | 0 – 20 | 0 | |
-| `size` | 0.005 – 0.05 | 0.02 | Avg radius. |
-| `opacity` | 0 – 1 | 0.5 | |
-| `animate` | bool | true | Drift slowly with time. |
+| Param     | Range        | Default | Meaning                 |
+| --------- | ------------ | ------- | ----------------------- |
+| `enabled` | bool         | false   |                         |
+| `count`   | 0 – 20       | 0       |                         |
+| `size`    | 0.005 – 0.05 | 0.02    | Avg radius.             |
+| `opacity` | 0 – 1        | 0.5     |                         |
+| `animate` | bool         | true    | Drift slowly with time. |
 
 **Implementation:** As Phaser sprites, not a shader. Drift slowly with `time + sin(time)*amplitude` for organic motion.
 
@@ -197,12 +198,12 @@ Specks/strands inside the vitreous; cast moving shadows.
 
 Optional/playful. Zigzag scotoma that drifts across the visual field over 15–30 minutes. v1 ships a static "aura is here right now" version.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `radius` | 0.05 – 0.3 | 0.15 | Size of the auric region. |
-| `position` | vec2 | (0.5, 0.5) | Center. |
-| `animate` | bool | true | Slow outward drift. |
+| Param      | Range      | Default    | Meaning                   |
+| ---------- | ---------- | ---------- | ------------------------- |
+| `enabled`  | bool       | false      |                           |
+| `radius`   | 0.05 – 0.3 | 0.15       | Size of the auric region. |
+| `position` | vec2       | (0.5, 0.5) | Center.                   |
+| `animate`  | bool       | true       | Slow outward drift.       |
 
 ---
 
@@ -210,12 +211,12 @@ Optional/playful. Zigzag scotoma that drifts across the visual field over 15–3
 
 The escape hatch. The user paints onto a per-eye canvas; the painted alpha becomes a mask texture passed to a shader that **applies the chosen effect only inside the painted region**.
 
-| Param | Range | Default | Meaning |
-|---|---|---|---|
-| `enabled` | bool | false | |
-| `maskTexture` | ImageData | empty | The painted alpha mask. |
-| `effect` | enum | `darken` | `darken` (v1), `blur` (v1.1), `desaturate` (v1.1) |
-| `intensity` | 0 – 1 | 1 | How strongly the effect applies. |
+| Param         | Range     | Default  | Meaning                                           |
+| ------------- | --------- | -------- | ------------------------------------------------- |
+| `enabled`     | bool      | false    |                                                   |
+| `maskTexture` | ImageData | empty    | The painted alpha mask.                           |
+| `effect`      | enum      | `darken` | `darken` (v1), `blur` (v1.1), `desaturate` (v1.1) |
+| `intensity`   | 0 – 1     | 1        | How strongly the effect applies.                  |
 
 The mask is drawn on a small canvas in the sidebar that previews the image faintly underneath, so the user can paint exactly where they want the scotoma. See [`05-ui-ux-design.md`](./05-ui-ux-design.md) for the mask drawing UX.
 

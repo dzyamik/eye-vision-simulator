@@ -26,7 +26,7 @@ import { computed } from 'vue';
 // Internal imports (alphabetical)
 import { useEyeSettingsStore } from '@/stores/eyeSettings';
 import RangeInput from '@/components/sidebar/RangeInput.vue';
-import type { /* ... */ } from '@/types/eyeSettings';
+import type {} from /* ... */ '@/types/eyeSettings';
 
 const props = defineProps<{
   /* typed props */
@@ -41,7 +41,9 @@ const store = useEyeSettingsStore();
 // Computed bindings (writable v-models that point at the store)
 const value = computed<number>({
   get: () => store.left.myopia.strength,
-  set: (v) => { store.left.myopia.strength = v; },
+  set: (v) => {
+    store.left.myopia.strength = v;
+  },
 });
 </script>
 
@@ -98,7 +100,9 @@ const settings = computed(() => store[props.eye]);
 
 const strength = computed<number>({
   get: () => settings.value.myopia.strength,
-  set: (v) => { settings.value.myopia.strength = v; },
+  set: (v) => {
+    settings.value.myopia.strength = v;
+  },
 });
 ```
 
@@ -114,7 +118,10 @@ const set = (mutator: (eye: EyeSettings) => void) => {
 
 const strength = computed<number>({
   get: () => store.left.myopia.strength,
-  set: (v) => set((eye) => { eye.myopia.strength = v; }),
+  set: (v) =>
+    set((eye) => {
+      eye.myopia.strength = v;
+    }),
 });
 ```
 
