@@ -276,9 +276,9 @@ For each pipeline, the pattern is:
 
 ### 6.9 Floaters (sprite-based, not a shader)
 
-- [ ] Add a few floater PNG textures to `public/textures/`.
-- [ ] Spawn N sprites with random positions, drifting slowly.
-- [ ] Respect `prefers-reduced-motion`.
+- [x] Add a few floater PNG textures to `public/textures/`.
+- [x] Spawn N sprites with random positions, drifting slowly.
+- [x] Respect `prefers-reduced-motion`.
 
 **Acceptance:** A handful of floaters drift across the impaired view; opacity slider works.
 

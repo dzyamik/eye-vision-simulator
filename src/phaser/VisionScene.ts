@@ -36,6 +36,7 @@ export class VisionScene extends Phaser.Scene {
     this.isReady = true;
     this.scale.on('resize', this.fitSprite, this);
     this.ensureCataractNoise();
+    this.ensureFloaterTexture();
     if (this.pendingSrc !== null) {
       const src = this.pendingSrc;
       this.pendingSrc = null;
@@ -69,6 +70,30 @@ export class VisionScene extends Phaser.Scene {
       img.data[i + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);
+    this.textures.addCanvas(key, canvas);
+  }
+
+  /** Soft dark radial-gradient blob registered as the 'floater' texture.
+   *  Used by FloatersPipeline; one shared texture rendered at varying
+   *  scales/rotations/alphas per sprite gives enough visual variety
+   *  without bundling multiple assets. */
+  private ensureFloaterTexture(): void {
+    const key = 'floater';
+    if (this.textures.exists(key)) return;
+    const size = 32;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (ctx === null) return;
+    const cx = size / 2;
+    const cy = size / 2;
+    const grad = ctx.createRadialGradient(cx, cy, size * 0.1, cx, cy, size * 0.5);
+    grad.addColorStop(0, 'rgba(15, 17, 21, 1)');
+    grad.addColorStop(0.6, 'rgba(15, 17, 21, 0.5)');
+    grad.addColorStop(1, 'rgba(15, 17, 21, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
     this.textures.addCanvas(key, canvas);
   }
 
