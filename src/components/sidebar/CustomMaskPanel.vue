@@ -1,12 +1,13 @@
 <script setup lang="ts">
-// Effect select + intensity slider. The actual paint canvas + maskData
-// upload is wired in Phase 8 (8.2 / 8.3). For 5.3 the sidebar shows the
-// configuration controls and a "canvas — Phase 8" placeholder.
+// Effect select + intensity slider + the paint surface (MaskPanel, 8.2).
+// The 8.3 CustomMaskPipeline reads eyeSettings[side].customMask.maskData
+// which MaskPanel pushes on pointer-up.
 
 import { useEyeParam } from '@/composables/useEyeParam';
 import type { MaskEffect } from '@/types/eyeSettings';
 
 import ConditionPanel from './ConditionPanel.vue';
+import MaskPanel from './MaskPanel.vue';
 import PerEyeRow from './PerEyeRow.vue';
 import RangeRow from './RangeRow.vue';
 
@@ -55,7 +56,7 @@ const EFFECTS: readonly EffectOption[] = [
         :disabled-left="disabledLeft"
         :disabled-right="disabledRight"
       />
-      <p class="placeholder">Paint canvas + brush controls land in Phase 8.2.</p>
+      <MaskPanel />
     </template>
   </ConditionPanel>
 </template>
@@ -73,15 +74,5 @@ const EFFECTS: readonly EffectOption[] = [
 
 .select:disabled {
   cursor: not-allowed;
-}
-
-.placeholder {
-  margin: var(--pad-sm) 0 0;
-  padding: var(--pad-sm);
-  font-size: var(--t-sm);
-  color: var(--fg-dim);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
-  text-align: center;
 }
 </style>

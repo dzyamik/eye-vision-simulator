@@ -325,9 +325,9 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 8.2 `MaskPanel.vue`
 
-- [ ] Renders the preview image underneath at low alpha.
-- [ ] Paint canvas on top accepts pointer events.
-- [ ] Brush size, hardness, mode (paint / erase / clear) controls.
+- [x] Renders the preview image underneath at low alpha.
+- [x] Paint canvas on top accepts pointer events.
+- [x] Brush size, hardness, mode (paint / erase / clear) controls.
 
 **Acceptance:** A user can paint, erase, and clear; the mask is visible during editing.
 
