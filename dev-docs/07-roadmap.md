@@ -139,9 +139,9 @@ Goal: a Phaser canvas living inside `ImpairedView`, rendering the current image 
 
 ### 4.2 `usePhaser.ts` composable
 
-- [ ] Singleton-ish: creates the game on first call, returns the same handle subsequently.
-- [ ] Exposes `setImage(src)`, `dispose()`, and a `gameReady` promise.
-- [ ] Cleanly destroys old textures when swapping images.
+- [x] Singleton-ish: creates the game on first call, returns the same handle subsequently.
+- [x] Exposes `setImage(src)`, `dispose()`, and a `gameReady` promise.
+- [x] Cleanly destroys old textures when swapping images.
 
 **Acceptance:** Changing the image (sample → upload → another sample) updates the impaired view without leaking textures (verify in DevTools memory snapshot).
 

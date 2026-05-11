@@ -1,35 +1,36 @@
 <script setup lang="ts">
-// Mounts the single Phaser game into a Vue-owned container div. For 4.1 the
-// wiring is inline; the usePhaser composable (4.2) will move the
-// singleton/dispose/gameReady plumbing out of the component.
+// Hosts the Phaser canvas. State is delegated to the usePhaser composable;
+// this component is responsible only for owning the mount node, syncing the
+// current image into Phaser, and tearing the singleton down on unmount.
 
 import { storeToRefs } from 'pinia';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
-import { createGame, type GameHandle } from '@/phaser/createGame';
+import { usePhaser } from '@/composables/usePhaser';
 import { useImageStore } from '@/stores/image';
 
 const container = ref<HTMLDivElement | null>(null);
 const { current } = storeToRefs(useImageStore());
-let handle: GameHandle | null = null;
+let phaser: ReturnType<typeof usePhaser> | null = null;
 
-onMounted(() => {
+onMounted(async () => {
   if (container.value === null) return;
-  handle = createGame(container.value);
+  phaser = usePhaser(container.value);
+  await phaser.gameReady;
   if (current.value !== null) {
-    handle.scene.setImage(current.value.src);
+    phaser.setImage(current.value.src);
   }
 });
 
 watch(current, (next) => {
-  if (handle !== null && next !== null) {
-    handle.scene.setImage(next.src);
+  if (phaser !== null && next !== null) {
+    phaser.setImage(next.src);
   }
 });
 
 onBeforeUnmount(() => {
-  handle?.destroy();
-  handle = null;
+  phaser?.dispose();
+  phaser = null;
 });
 </script>
 
