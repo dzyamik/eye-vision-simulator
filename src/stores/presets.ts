@@ -1,12 +1,14 @@
 // Named EyeSettings snapshots ("Mild myopia", "Wet AMD", ...). Built-in list
-// is populated in step 9.1; user presets stay in-memory with manual export to
-// JSON (no localStorage — see dev-docs/06-state-management.md §Persistence).
+// is sourced from src/constants/builtInPresets.ts; user presets stay
+// in-memory with manual export to JSON (no localStorage — see
+// dev-docs/06-state-management.md §Persistence).
 //
 // Mask serialization (ImageData ↔ base64 PNG) for export/import is wired in 9.2.
 
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+import { BUILT_IN_PRESETS } from '@/constants/builtInPresets';
 import type { EyeSettings } from '@/types/eyeSettings';
 import { deepClone } from '@/utils/clone';
 
@@ -21,7 +23,9 @@ export interface Preset {
 }
 
 export const usePresetsStore = defineStore('presets', () => {
-  const builtIn = ref<Preset[]>([]);
+  // Use spread so the store's array is independent of the imported readonly
+  // tuple — protects against accidental mutation via the store ref.
+  const builtIn = ref<Preset[]>([...BUILT_IN_PRESETS]);
   const userPresets = ref<Preset[]>([]);
 
   function load(preset: Preset): void {

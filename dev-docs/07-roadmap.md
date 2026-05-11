@@ -350,8 +350,8 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 9.1 Built-in presets
 
-- [ ] Populate `usePresetsStore.builtIn` with the six presets from `05-ui-ux-design.md`.
-- [ ] Loading a preset replaces both eyes' settings.
+- [x] Populate `usePresetsStore.builtIn` with the six presets from `05-ui-ux-design.md`.
+- [x] Loading a preset replaces both eyes' settings.
 
 **Acceptance:** Each built-in preset produces a recognizable, distinct visual result.
 
