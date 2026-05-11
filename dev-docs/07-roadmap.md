@@ -387,8 +387,8 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 9.6 README polish + build
 
-- [ ] Update README screenshots once UI is done.
-- [ ] `npm run build`; commit `docs/`; enable GH Pages.
+- [x] Update README screenshots once UI is done.
+- [x] `npm run build`; commit `docs/`; enable GH Pages.
 
 **Acceptance:** The live URL works.
 

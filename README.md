@@ -2,21 +2,21 @@
 
 An interactive web app that visualizes how the world looks through different visual impairments. Pick an image (or upload your own), tweak per-eye parameters in the sidebar, and the bottom canvas updates in real time to show the simulated result next to the original.
 
-> **Status:** Specification phase. Implementation is driven by [Claude Code](https://docs.claude.com/en/docs/claude-code) following [`dev-docs/07-roadmap.md`](./dev-docs/07-roadmap.md).
+> **Status:** v1 feature-complete. All 12 eye conditions render via Phaser 4 camera filters, with per-eye independent settings, sync mode, four view modes (both / left / right / split), built-in presets, JSON export/import (mask included), painted custom scotomas, and the standard error / empty / WebGL-unsupported states. See [`dev-docs/07-roadmap.md`](./dev-docs/07-roadmap.md) for the full work log.
 
 ## What it simulates
 
 Each eye is configured independently. Supported conditions:
 
-- **Refractive errors** — myopia, hyperopia, astigmatism (with axis), presbyopia
+- **Refractive errors** — myopia, hyperopia, astigmatism (with axis dial), presbyopia
 - **Color vision deficiencies** — protanopia, deuteranopia, tritanopia, achromatopsia (plus anomalous "weak" variants), with severity slider
-- **Cataracts** — nuclear (yellowing), cortical (spoke patterns), posterior subcapsular (glare/halos)
-- **Glaucoma** — peripheral vision loss / tunnel vision with adjustable radius and feather
+- **Cataracts** — nuclear (yellowing), cortical (cloudiness), posterior subcapsular (subtype presets); v1 ships yellowing + brightness loss + cloudiness, glare deferred
+- **Glaucoma** — peripheral vision loss / tunnel vision with adjustable radius
 - **Macular degeneration** — central scotoma with optional metamorphopsia (wavy distortion)
-- **Diabetic retinopathy** — scattered dark spots and patchy field loss
+- **Diabetic retinopathy** — scattered dark spots and patchy field loss (seeded RNG positions)
 - **Retinitis pigmentosa** — severe peripheral loss with brightness reduction
-- **Floaters and migraine aura** — optional overlays
-- **Custom localized scotomas** — paint blind spots directly onto a per-eye mask canvas
+- **Floaters and migraine aura** — animated sprite overlays (respect `prefers-reduced-motion`)
+- **Custom localized scotomas** — paint blind spots directly onto a per-eye 512×512 mask canvas; v1 effect is `darken`
 
 For each condition, parameters are continuous (sliders) so you can move from a clear eye to severe impairment and watch the change.
 
@@ -24,57 +24,72 @@ For each condition, parameters are continuous (sliders) so you can move from a c
 
 ```
 ┌────────────────────────────────────┬───────────────────┐
-│  Original image (top half)         │                   │
-│  ────────────────────────────────  │   Sidebar         │
-│  Impaired view (bottom half)       │   • Eye selector  │
-│   • Phaser/WebGL canvas            │   • Condition     │
-│   • Updates in real time           │     panels        │
-│                                    │   • Per-eye mask  │
-│                                    │     drawing       │
-│                                    │   • Presets       │
+│  Original image (top half)         │  ☑ Sync both eyes │
+│  ────────────────────────────────  │  L [Reset] [Copy] │
+│  Impaired view (bottom half)       │  R [Reset] [Copy] │
+│   • Phaser/WebGL canvas            │                   │
+│   • Updates in real time           │  Presets          │
+│   • View-mode toggle (both/L/R/    │   • six built-in  │
+│     side-by-side)                  │   • Export / Imp. │
+│                                    │                   │
+│                                    │  ▾ Refractive     │
+│                                    │  ▸ Colour vision  │
+│                                    │  ▸ Cataract       │
+│                                    │  ▸ Field loss     │
+│                                    │  ▸ Overlays       │
+│                                    │  ▸ Custom mask    │
 └────────────────────────────────────┴───────────────────┘
 ```
 
-Use the **eye selector** in the sidebar to toggle which eye's settings you're editing (Left / Right / Both). The bottom view itself can be switched between "both eyes blended", "left only", "right only", and "side-by-side" via a small toolbar above it.
+Each condition panel has a per-eye `L` and `R` enabled checkbox; sliders below show two rows (one per eye). The **Sync both eyes** toggle at the top of the sidebar mirrors writes across L ↔ R.
 
 ## Tech stack
 
 | Layer        | Choice                                                    |
 | ------------ | --------------------------------------------------------- |
-| Language     | TypeScript                                                |
+| Language     | TypeScript (strict)                                       |
 | Build tool   | Vite (output to `docs/` for GitHub Pages)                 |
 | UI framework | Vue 3 (Composition API, `<script setup>`)                 |
 | State        | Pinia                                                     |
-| Rendering    | Phaser 3 with custom `PostFXPipeline` shaders             |
+| Rendering    | Phaser 4 with the unified Filter system                   |
+| Tests        | Vitest                                                    |
+| Lint/format  | ESLint + Prettier                                         |
 | Styling      | Plain CSS / CSS variables (no Tailwind — keep deps light) |
 
-See [`dev-docs/02-tech-stack.md`](./dev-docs/02-tech-stack.md) for the full rationale.
+See [`dev-docs/02-tech-stack.md`](./dev-docs/02-tech-stack.md) for the full rationale, and [`CLAUDE.md`](./CLAUDE.md) for the Phaser-3 → Phaser-4 decision.
 
-## Getting started (after implementation)
+## Getting started
 
 ```bash
 # Install
 npm install
 
-# Run dev server
+# Run dev server (http://localhost:5173/eye-vision-simulator/)
 npm run dev
 
 # Build to ./docs for GitHub Pages
 npm run build
 
-# Preview the production build locally
+# Preview the production build locally (http://localhost:4173/eye-vision-simulator/)
 npm run preview
+
+# Lint / format / test
+npm run lint
+npm run format
+npm run test         # watch mode
+npm run test:run     # single-shot
 ```
 
 ## Deploying to GitHub Pages
 
-1. Push the `docs/` folder to `main` (it's the build output — commit it).
-2. In the repo settings → **Pages**, set:
+1. `npm run build` writes the production bundle to `docs/`.
+2. Commit and push `docs/` along with the rest of the change.
+3. In the repo settings → **Pages**, set:
    - **Source:** Deploy from a branch
    - **Branch:** `main` / `/docs`
-3. The site goes live at `https://<user>.github.io/<repo>/`.
+4. The site goes live at `https://<user>.github.io/<repo>/`.
 
-The `base` path in `vite.config.ts` must match `/<repo>/` so assets resolve correctly.
+The `base` path in `vite.config.ts` is hard-coded to `/eye-vision-simulator/` so asset URLs resolve correctly under the GH Pages subdirectory. If you fork to a different repo name, update `repoName` at the top of `vite.config.ts` to match.
 
 ## Project structure
 
@@ -84,9 +99,22 @@ The `base` path in `vite.config.ts` must match `/<repo>/` so assets resolve corr
 ├── CLAUDE.md                  ← Claude Code project guide
 ├── .claude/                   ← skills + slash commands for Claude Code
 ├── dev-docs/                  ← detailed specification documents
-├── src/                       ← (created during implementation)
-├── public/                    ← (created during implementation)
-├── docs/                      ← (build output, committed for GH Pages)
+├── src/
+│   ├── main.ts                ← Vue + Pinia bootstrap
+│   ├── App.vue
+│   ├── components/            ← layout, viewer, sidebar
+│   ├── composables/           ← usePhaser, useEyeParam, useMaskCanvas
+│   ├── stores/                ← eyeSettings, viewSettings, image, presets, toast
+│   ├── phaser/
+│   │   ├── createGame.ts
+│   │   ├── VisionScene.ts
+│   │   ├── pipelineManager.ts ← single broker between Pinia and the camera filter stack
+│   │   └── pipelines/         ← one adapter per condition
+│   ├── constants/             ← ranges, colour matrices, built-in presets
+│   ├── types/                 ← canonical EyeSettings interface
+│   └── utils/                 ← deepClone, image helpers
+├── public/samples/            ← bundled sample images + manifest
+├── docs/                      ← build output (committed for GH Pages)
 ├── package.json
 ├── vite.config.ts
 └── tsconfig.json
@@ -95,6 +123,8 @@ The `base` path in `vite.config.ts` must match `/<repo>/` so assets resolve corr
 ## Educational disclaimer
 
 This tool is a **simulation for learning and empathy-building purposes only**. The visuals are best-effort approximations based on published research; they are not medical diagnoses, not personalized to any real patient, and not a substitute for an eye care professional. Real vision impairments are heterogeneous, evolve over time, and involve neurological compensations that can't be captured on a screen.
+
+(The same notice appears as a one-time dismissible banner inside the app.)
 
 ## Sample image credits
 
