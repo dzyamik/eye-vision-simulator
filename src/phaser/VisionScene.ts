@@ -35,12 +35,41 @@ export class VisionScene extends Phaser.Scene {
   create(): void {
     this.isReady = true;
     this.scale.on('resize', this.fitSprite, this);
+    this.ensureCataractNoise();
     if (this.pendingSrc !== null) {
       const src = this.pendingSrc;
       this.pendingSrc = null;
       this.setImage(src);
     }
     this.resolveReady();
+  }
+
+  /** Lazily seeds a 128×128 grayscale-noise texture under 'cataract-noise',
+   *  used as the cloud-modulation source by CataractPipeline's Blend filter.
+   *  Idempotent — if the scene is re-created (HMR) we keep the existing
+   *  texture (or regenerate; here we just skip when present). */
+  private ensureCataractNoise(): void {
+    const key = 'cataract-noise';
+    if (this.textures.exists(key)) return;
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (ctx === null) return;
+    const img = ctx.createImageData(size, size);
+    for (let i = 0; i < img.data.length; i += 4) {
+      // Range [180, 255] gives a light, low-contrast grain — enough to break
+      // up flat tinting without dominating the haze. Math.random is fine;
+      // we never need to reproduce this noise.
+      const v = (180 + Math.floor(Math.random() * 76)) & 0xff;
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    this.textures.addCanvas(key, canvas);
   }
 
   setImage(src: string): void {

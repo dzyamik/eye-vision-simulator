@@ -25,6 +25,7 @@ import type { ConditionKey, EyeSettings } from '@/types/eyeSettings';
 
 import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipeline';
 import { disposeBlur, syncBlur } from './pipelines/BlurPipeline';
+import { disposeCataract, syncCataract } from './pipelines/CataractPipeline';
 import { disposeColorVision, syncColorVision } from './pipelines/ColorVisionPipeline';
 
 export const STACKING_ORDER: readonly ConditionKey[] = [
@@ -122,6 +123,20 @@ function syncColorVisionFromStore(eye: ReturnType<typeof useEyeSettingsStore>): 
   });
 }
 
+function syncCataractFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (camera === null) return;
+  syncCataract(camera, {
+    leftActive: eye.left.cataract.enabled,
+    leftCloudiness: eye.left.cataract.cloudiness,
+    leftYellowing: eye.left.cataract.yellowing,
+    leftBrightnessLoss: eye.left.cataract.brightnessLoss,
+    rightActive: eye.right.cataract.enabled,
+    rightCloudiness: eye.right.cataract.cloudiness,
+    rightYellowing: eye.right.cataract.yellowing,
+    rightBrightnessLoss: eye.right.cataract.brightnessLoss,
+  });
+}
+
 export const pipelineManager: PipelineManager = {
   init(scene): void {
     if (camera !== null && stopWatch !== null) {
@@ -130,6 +145,7 @@ export const pipelineManager: PipelineManager = {
       disposeBlur(camera);
       disposeAstigmatism(camera);
       disposeColorVision(camera);
+      disposeCataract(camera);
     }
     camera = scene.cameras.main;
     const eye = useEyeSettingsStore();
@@ -165,8 +181,9 @@ export const pipelineManager: PipelineManager = {
     // by STACKING_ORDER. For now color-then-blur visually approximates the
     // intended pipeline.
     syncColorVisionFromStore(eye);
+    syncCataractFromStore(eye);
     syncBlurFromStore(eye);
     syncAstigmatismFromStore(eye);
-    // 6.5+ adds more per-condition syncs here (syncCataract, syncGlaucoma, …).
+    // 6.6+ adds more per-condition syncs here (syncGlaucoma, syncAmd, …).
   },
 };

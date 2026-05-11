@@ -249,9 +249,9 @@ For each pipeline, the pattern is:
 
 ### 6.5 Cataract pipeline
 
-- [ ] Combined yellowing + cloudiness + brightness loss + glare shader.
-- [ ] Use a small noise PNG in `public/textures/` for cloud variation.
-- [ ] Subtype radio buttons preset the four sliders.
+- [x] Combined yellowing + cloudiness + brightness loss + glare shader.
+- [x] Use a small noise PNG in `public/textures/` for cloud variation.
+- [x] Subtype radio buttons preset the four sliders.
 
 **Acceptance:** Each subtype produces a visually distinct result matching the descriptions in `03-eye-conditions.md`.
 
