@@ -181,12 +181,12 @@ Goal: full sidebar UI with all sliders and toggles, wired to Pinia. Still no sha
 
 ### 5.3 Build out every condition panel
 
-- [ ] Refractive group: Myopia, Hyperopia, Astigmatism (with axis dial), Presbyopia.
-- [ ] Color group: ColorVision (type select + severity slider).
-- [ ] Lens group: Cataract (subtype radio + four sliders).
-- [ ] Field loss group: Glaucoma, AMD, Diabetic retinopathy, Retinitis pigmentosa.
-- [ ] Overlays group: Floaters, Migraine aura.
-- [ ] Custom mask group: (UI only; canvas wiring in phase 8).
+- [x] Refractive group: Myopia, Hyperopia, Astigmatism (with axis dial), Presbyopia.
+- [x] Color group: ColorVision (type select + severity slider).
+- [x] Lens group: Cataract (subtype radio + four sliders).
+- [x] Field loss group: Glaucoma, AMD, Diabetic retinopathy, Retinitis pigmentosa.
+- [x] Overlays group: Floaters, Migraine aura.
+- [x] Custom mask group: (UI only; canvas wiring in phase 8).
 
 **Acceptance:** Every parameter from `03-eye-conditions.md` is reachable in the UI. Tooltips show short descriptions.
 
