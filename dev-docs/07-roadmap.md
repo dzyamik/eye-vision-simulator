@@ -333,8 +333,8 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 8.3 `CustomMaskPipeline.ts`
 
-- [ ] Reads the mask `ImageData` as a `THREE`-free WebGL texture and applies the chosen effect (v1: darken).
-- [ ] Re-uploads the mask only when it actually changes (compare reference equality).
+- [x] Reads the mask `ImageData` as a `THREE`-free WebGL texture and applies the chosen effect (v1: darken).
+- [x] Re-uploads the mask only when it actually changes (compare reference equality).
 
 **Acceptance:** Painted areas darken the corresponding pixels in the impaired view, within ~50 ms of pointer release.
 

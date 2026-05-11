@@ -10,7 +10,7 @@
 // (one per eye) live on the component instance.
 
 import { storeToRefs } from 'pinia';
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, markRaw, onBeforeUnmount, ref, watch } from 'vue';
 
 import { useMaskCanvas, type PaintMode } from '@/composables/useMaskCanvas';
 import { useEyeSettingsStore } from '@/stores/eyeSettings';
@@ -39,7 +39,13 @@ let isPainting = false;
 function pushToStore(): void {
   const data = activeMask.value.getImageData();
   if (data !== null) {
-    eye[activeSide.value].customMask.maskData = data;
+    // markRaw so Vue doesn't wrap the ImageData (and its underlying typed
+    // array) in a reactive Proxy. The store's `maskData` property is
+    // still reactive — the parent assignment fires the watcher — but the
+    // ImageData object itself stays in its native form so consumers
+    // (CustomMaskPipeline → putImageData → uploadMask) see a real
+    // ImageData and not a proxy that breaks DOM API contracts.
+    eye[activeSide.value].customMask.maskData = markRaw(data);
   }
 }
 

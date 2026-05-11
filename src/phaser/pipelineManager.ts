@@ -32,6 +32,7 @@ import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipe
 import { disposeBlur, syncBlur } from './pipelines/BlurPipeline';
 import { disposeCataract, syncCataract } from './pipelines/CataractPipeline';
 import { disposeColorVision, syncColorVision } from './pipelines/ColorVisionPipeline';
+import { disposeCustomMask, syncCustomMask } from './pipelines/CustomMaskPipeline';
 import {
   disposeDiabeticRetinopathy,
   syncDiabeticRetinopathy,
@@ -266,6 +267,28 @@ function syncAmdFromStore(
   });
 }
 
+function syncCustomMaskFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  if (scene === null) return;
+  const [actL, actR] = pickPair(viewMode, eye.left.customMask.enabled, eye.right.customMask.enabled);
+  const [mL, mR] = pickPair(viewMode, eye.left.customMask.maskData, eye.right.customMask.maskData);
+  const [iL, iR] = pickPair(viewMode, eye.left.customMask.intensity, eye.right.customMask.intensity);
+  const [eL, eR] = pickPair(viewMode, eye.left.customMask.effect, eye.right.customMask.effect);
+  syncCustomMask(scene, cam, {
+    leftActive: actL,
+    leftMaskData: mL,
+    leftIntensity: iL,
+    leftEffect: eL,
+    rightActive: actR,
+    rightMaskData: mR,
+    rightIntensity: iR,
+    rightEffect: eR,
+  });
+}
+
 function syncDrFromStore(
   eye: ReturnType<typeof useEyeSettingsStore>,
   viewMode: ViewMode,
@@ -317,6 +340,7 @@ function syncFilterPipelinesForCamera(
   syncBlurFromStore(eye, viewMode, cam);
   syncAstigmatismFromStore(eye, viewMode, cam);
   syncAmdFromStore(eye, viewMode, cam);
+  syncCustomMaskFromStore(eye, viewMode, cam);
   syncGlaucomaFromStore(eye, viewMode, cam);
   syncRetinitisPigmentosaFromStore(eye, viewMode, cam);
   syncDrFromStore(eye, viewMode, cam);
@@ -330,6 +354,7 @@ function disposeAllFiltersOn(cam: Phaser.Cameras.Scene2D.Camera): void {
   disposeBlur(cam);
   disposeAstigmatism(cam);
   disposeAmd(cam);
+  disposeCustomMask(cam);
   disposeGlaucoma(cam);
   disposeRetinitisPigmentosa(cam);
   disposeDiabeticRetinopathy(cam);
