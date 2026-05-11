@@ -371,9 +371,9 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 9.4 Performance pass
 
-- [ ] Profile with all conditions enabled on a 1080p image; aim for ≥30 fps.
-- [ ] Coalesce slider events with `requestAnimationFrame`.
-- [ ] Verify no memory leaks across image swaps (DevTools).
+- [x] Profile with all conditions enabled on a 1080p image; aim for ≥30 fps.
+- [x] Coalesce slider events with `requestAnimationFrame`.
+- [x] Verify no memory leaks across image swaps (DevTools).
 
 **Acceptance:** Targets in `01-architecture.md` met.
 

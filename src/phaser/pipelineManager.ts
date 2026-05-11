@@ -75,6 +75,20 @@ let camera: Phaser.Cameras.Scene2D.Camera | null = null;
 let scene: Phaser.Scene | null = null;
 let stopWatch: (() => void) | null = null;
 
+// RAF-coalesce the watcher: multiple slider events within a frame fold
+// into one syncFromStore() call. Vue's flush: 'post' already batches at
+// microtask granularity; this caps work at one sync per frame regardless
+// of how rapidly the source events fire.
+let syncRafId: number | null = null;
+
+function scheduleSync(): void {
+  if (syncRafId !== null) return;
+  syncRafId = requestAnimationFrame(() => {
+    syncRafId = null;
+    pipelineManager.syncFromStore();
+  });
+}
+
 function clamp01(n: number): number {
   if (n < 0) return 0;
   if (n > 1) return 1;
@@ -430,13 +444,18 @@ export const pipelineManager: PipelineManager = {
     }
     scene = sceneArg;
     camera = sceneArg.cameras.main;
+    if (syncRafId !== null) {
+      cancelAnimationFrame(syncRafId);
+      syncRafId = null;
+    }
     const eye = useEyeSettingsStore();
     const view = useViewSettingsStore();
     stopWatch = watch(
       () => [eye.left, eye.right, view.viewMode] as [EyeSettings, EyeSettings, ViewMode],
-      () => pipelineManager.syncFromStore(),
+      scheduleSync,
       { deep: true, flush: 'post' },
     );
+    // Initial sync runs immediately (no RAF) so first paint is correct.
     pipelineManager.syncFromStore();
   },
 
