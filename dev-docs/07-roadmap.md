@@ -420,13 +420,13 @@ EyeSettings + ViewSettings shape without loss (excluding mask).
 
 ### 10.2 `useUrlSync.ts` composable
 
-- [ ] On app load: parse `window.location.search`; if `?s=` is present,
+- [x] On app load: parse `window.location.search`; if `?s=` is present,
       decode and apply to `useEyeSettingsStore` + `useViewSettingsStore`
       + `useImageStore` (sample selection).
-- [ ] Watch the relevant stores; on change, debounce ~300 ms then write
+- [x] Watch the relevant stores; on change, debounce ~300 ms then write
       `URLSearchParams` via `history.replaceState` (NOT `pushState` — back
       button shouldn't accumulate one entry per slider tick).
-- [ ] Skip writes when the encoded string equals the current `?s=`
+- [x] Skip writes when the encoded string equals the current `?s=`
       (avoids no-op `replaceState` calls during transient equal states).
 
 **Acceptance:** Editing sliders updates the URL bar live; pasting a

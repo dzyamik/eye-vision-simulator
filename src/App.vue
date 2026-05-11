@@ -21,6 +21,7 @@ import PresbyopiaPanel from '@/components/sidebar/PresbyopiaPanel.vue';
 import RetinitisPigmentosaPanel from '@/components/sidebar/RetinitisPigmentosaPanel.vue';
 import SyncToggle from '@/components/sidebar/SyncToggle.vue';
 import ImageViewer from '@/components/viewer/ImageViewer.vue';
+import { useUrlSync } from '@/composables/useUrlSync';
 import { useImageStore } from '@/stores/image';
 import { useToastStore } from '@/stores/toast';
 
@@ -33,6 +34,10 @@ onMounted(async () => {
   } catch (err) {
     toast.push(`Sample images failed to load: ${(err as Error).message}`, { type: 'error' });
   }
+  // useUrlSync() registers the watcher; applyFromCurrentUrl applies any
+  // ?s= blob in the address bar. Order matters — sample manifest must be
+  // loaded first so a sample-by-filename lookup in the URL state can hit.
+  useUrlSync().applyFromCurrentUrl();
 });
 </script>
 
