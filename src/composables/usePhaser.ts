@@ -6,6 +6,14 @@
 // gameReady is a promise that settles when the scene's create() has run, so
 // callers can defer pipeline attachment / sprite manipulation until Phaser
 // is past its async boot.
+//
+// We also wire a ResizeObserver on the parent here. Phaser.Scale.RESIZE
+// auto-tracks window resize, but not parent-container reflow (e.g. the
+// sidebar drawer toggling on mobile, or the layout grid changing). Without
+// the observer the canvas stays at its old size until the user happens to
+// resize the window. game.scale.refresh() is RAF-coalesced so a burst of
+// resize callbacks (which Chrome can emit during animations) only triggers
+// one refresh per frame.
 
 import { createGame, type GameHandle } from '@/phaser/createGame';
 
@@ -20,6 +28,8 @@ interface PhaserBridge {
 
 let handle: GameHandle | null = null;
 let gameReady: Promise<void> | null = null;
+let resizeObserver: ResizeObserver | null = null;
+let pendingRaf: number | null = null;
 
 export function usePhaser(parent: HTMLElement): PhaserBridge {
   if (handle === null) {
@@ -28,6 +38,15 @@ export function usePhaser(parent: HTMLElement): PhaserBridge {
     // through. (We can't subscribe to scene.events here directly — Phaser
     // hasn't initialised the scene's plugin instances yet at this point.)
     gameReady = handle.scene.ready;
+
+    resizeObserver = new ResizeObserver(() => {
+      if (pendingRaf !== null) return;
+      pendingRaf = requestAnimationFrame(() => {
+        pendingRaf = null;
+        handle?.game.scale.refresh();
+      });
+    });
+    resizeObserver.observe(parent);
   }
 
   // Snapshot the promise at call time. After dispose() we set the module
@@ -40,6 +59,12 @@ export function usePhaser(parent: HTMLElement): PhaserBridge {
       handle?.scene.setImage(src);
     },
     dispose(): void {
+      resizeObserver?.disconnect();
+      resizeObserver = null;
+      if (pendingRaf !== null) {
+        cancelAnimationFrame(pendingRaf);
+        pendingRaf = null;
+      }
       handle?.destroy();
       handle = null;
       gameReady = null;

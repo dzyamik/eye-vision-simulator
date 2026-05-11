@@ -147,7 +147,7 @@ Goal: a Phaser canvas living inside `ImpairedView`, rendering the current image 
 
 ### 4.3 Resize handling
 
-- [ ] On window resize and on viewer-container resize (use `ResizeObserver`), the Phaser canvas resizes and the sprite re-centers/re-fits.
+- [x] On window resize and on viewer-container resize (use `ResizeObserver`), the Phaser canvas resizes and the sprite re-centers/re-fits.
 
 **Acceptance:** Resizing the window keeps both viewers showing the same image at the same aspect.
 
