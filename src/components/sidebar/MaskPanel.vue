@@ -12,7 +12,7 @@
 import { storeToRefs } from 'pinia';
 import { computed, markRaw, onBeforeUnmount, ref, watch } from 'vue';
 
-import { useMaskCanvas, type PaintMode } from '@/composables/useMaskCanvas';
+import { useMaskCanvas, type PaintMode, type MaskCanvas } from '@/composables/useMaskCanvas';
 import { useEyeSettingsStore } from '@/stores/eyeSettings';
 import { useImageStore } from '@/stores/image';
 
@@ -25,6 +25,35 @@ const { current: currentImage } = storeToRefs(useImageStore());
 
 const leftMask = useMaskCanvas();
 const rightMask = useMaskCanvas();
+
+// Track the ImageData reference we last pushed ourselves, so the
+// maskData watchers below can ignore their own pushes and only repaint
+// the on-screen canvas when the store changes externally (preset load,
+// JSON import, Copy → other-eye).
+const lastSelfPushed: { left: ImageData | null; right: ImageData | null } = {
+  left: null,
+  right: null,
+};
+
+function restoreCanvasFromStore(side: Side, mask: MaskCanvas): void {
+  const data = eye[side].customMask.maskData;
+  if (data === lastSelfPushed[side]) return;
+  const ctx = mask.canvas.getContext('2d');
+  if (ctx === null) return;
+  ctx.clearRect(0, 0, mask.canvas.width, mask.canvas.height);
+  if (data !== null) ctx.putImageData(data, 0, 0);
+}
+
+watch(
+  () => eye.left.customMask.maskData,
+  () => restoreCanvasFromStore('left', leftMask),
+  { flush: 'post' },
+);
+watch(
+  () => eye.right.customMask.maskData,
+  () => restoreCanvasFromStore('right', rightMask),
+  { flush: 'post' },
+);
 
 const activeSide = ref<Side>('left');
 const activeMask = computed(() => (activeSide.value === 'left' ? leftMask : rightMask));
@@ -45,6 +74,7 @@ function pushToStore(): void {
     // ImageData object itself stays in its native form so consumers
     // (CustomMaskPipeline → putImageData → uploadMask) see a real
     // ImageData and not a proxy that breaks DOM API contracts.
+    lastSelfPushed[activeSide.value] = data;
     eye[activeSide.value].customMask.maskData = markRaw(data);
   }
 }
@@ -100,6 +130,7 @@ function copyToOther(): void {
   toCtx.clearRect(0, 0, toMask.canvas.width, toMask.canvas.height);
   toCtx.drawImage(fromMask.canvas, 0, 0);
   const data = toCtx.getImageData(0, 0, toMask.canvas.width, toMask.canvas.height);
+  lastSelfPushed[otherSide] = data;
   eye[otherSide].customMask.maskData = markRaw(data);
 }
 

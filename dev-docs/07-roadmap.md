@@ -357,8 +357,8 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 9.2 Export / import preset JSON
 
-- [ ] Serialize current state (including mask as base64 PNG) to a downloadable JSON.
-- [ ] File-picker import restores state.
+- [x] Serialize current state (including mask as base64 PNG) to a downloadable JSON.
+- [x] File-picker import restores state.
 
 **Acceptance:** Round-trip export → import produces an identical visual result.
 
