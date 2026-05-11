@@ -34,6 +34,7 @@ import {
 } from './pipelines/DiabeticRetinopathyPipeline';
 import { disposeFloaters, syncFloaters } from './pipelines/FloatersPipeline';
 import { disposeGlaucoma, syncGlaucoma } from './pipelines/GlaucomaPipeline';
+import { disposeMigraineAura, syncMigraineAura } from './pipelines/MigraineAuraPipeline';
 import {
   disposeRetinitisPigmentosa,
   syncRetinitisPigmentosa,
@@ -217,6 +218,22 @@ function syncFloatersFromStore(eye: ReturnType<typeof useEyeSettingsStore>): voi
   });
 }
 
+function syncMigraineAuraFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (scene === null) return;
+  syncMigraineAura(scene, {
+    leftActive: eye.left.migraineAura.enabled,
+    leftRadius: eye.left.migraineAura.radius,
+    leftPositionX: eye.left.migraineAura.positionX,
+    leftPositionY: eye.left.migraineAura.positionY,
+    leftAnimate: eye.left.migraineAura.animate,
+    rightActive: eye.right.migraineAura.enabled,
+    rightRadius: eye.right.migraineAura.radius,
+    rightPositionX: eye.right.migraineAura.positionX,
+    rightPositionY: eye.right.migraineAura.positionY,
+    rightAnimate: eye.right.migraineAura.animate,
+  });
+}
+
 export const pipelineManager: PipelineManager = {
   init(sceneArg): void {
     if (camera !== null && stopWatch !== null) {
@@ -231,6 +248,7 @@ export const pipelineManager: PipelineManager = {
       disposeAmd(camera);
       disposeDiabeticRetinopathy(camera);
       disposeFloaters();
+      disposeMigraineAura();
     }
     scene = sceneArg;
     camera = sceneArg.cameras.main;
@@ -275,6 +293,7 @@ export const pipelineManager: PipelineManager = {
     syncRetinitisPigmentosaFromStore(eye);
     syncDrFromStore(eye);
     syncFloatersFromStore(eye);
-    // 6.10+ adds migraine aura (sprite overlay) and the custom mask (8.x).
+    syncMigraineAuraFromStore(eye);
+    // Custom mask wires up in Phase 8.x.
   },
 };

@@ -284,8 +284,8 @@ For each pipeline, the pattern is:
 
 ### 6.10 Migraine aura (static v1)
 
-- [ ] One PNG overlay; position adjustable via the store.
-- [ ] If `animate` is true, slow outward drift via a sprite tween.
+- [x] One PNG overlay; position adjustable via the store.
+- [x] If `animate` is true, slow outward drift via a sprite tween.
 
 **Acceptance:** A zigzag pattern appears near the configured position.
 

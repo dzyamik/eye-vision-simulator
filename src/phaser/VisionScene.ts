@@ -37,6 +37,7 @@ export class VisionScene extends Phaser.Scene {
     this.scale.on('resize', this.fitSprite, this);
     this.ensureCataractNoise();
     this.ensureFloaterTexture();
+    this.ensureMigraineAuraTexture();
     if (this.pendingSrc !== null) {
       const src = this.pendingSrc;
       this.pendingSrc = null;
@@ -94,6 +95,60 @@ export class VisionScene extends Phaser.Scene {
     grad.addColorStop(1, 'rgba(15, 17, 21, 0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, size, size);
+    this.textures.addCanvas(key, canvas);
+  }
+
+  /** Procedural migraine-aura overlay: a partial-ring fortification
+   *  spectrum (C-shape with a gap on the right) with a jagged, shimmery
+   *  zigzag pattern modulated by angle. Pixels are bright cyan-white;
+   *  the alpha falls off at the band edges so a softer halo bleeds.
+   *  Rendered with ADD blend mode by MigraineAuraPipeline. */
+  private ensureMigraineAuraTexture(): void {
+    const key = 'migraine-aura';
+    if (this.textures.exists(key)) return;
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (ctx === null) return;
+    const img = ctx.createImageData(size, size);
+    const cx = size / 2;
+    const cy = size / 2;
+    const ringRadius = 45;
+    const ringWidth = 14;
+    // Hide the right side so the result reads as a fortification-spectrum
+    // C-shape: angles whose |a| exceeds this cutoff render transparent.
+    const OPEN_HALF_WIDTH = (3 * Math.PI) / 4;
+    const ZIGZAG_FREQ = 28;
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx); // -π..π
+        const i = (y * size + x) * 4;
+        if (Math.abs(angle) > OPEN_HALF_WIDTH) {
+          img.data[i + 3] = 0;
+          continue;
+        }
+        const distFromRing = Math.abs(dist - ringRadius);
+        if (distFromRing > ringWidth) {
+          img.data[i + 3] = 0;
+          continue;
+        }
+        // Soft radial fade across the ring band.
+        const radialFade = 1 - distFromRing / ringWidth;
+        // Zigzag/jagged modulation around the ring.
+        const zig = 0.5 + 0.5 * Math.sin(angle * ZIGZAG_FREQ);
+        const intensity = zig * radialFade;
+        img.data[i] = Math.round(200 * intensity);
+        img.data[i + 1] = Math.round(240 * intensity);
+        img.data[i + 2] = Math.round(255 * intensity);
+        img.data[i + 3] = Math.round(255 * intensity);
+      }
+    }
+    ctx.putImageData(img, 0, 0);
     this.textures.addCanvas(key, canvas);
   }
 
