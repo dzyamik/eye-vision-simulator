@@ -75,8 +75,8 @@ Goal: get the data model in place before any UI.
 
 ### 2.3 Constants and ranges
 
-- [ ] `src/constants/ranges.ts`: min/max/default for every numeric parameter (mirror `03-eye-conditions.md`).
-- [ ] `src/constants/colorMatrices.ts`: full matrices from `04-shaders-reference.md`.
+- [x] `src/constants/ranges.ts`: min/max/default for every numeric parameter (mirror `03-eye-conditions.md`).
+- [x] `src/constants/colorMatrices.ts`: full matrices from `04-shaders-reference.md`.
 
 **Acceptance:** All values are typed `as const`; importable from components later.
 
