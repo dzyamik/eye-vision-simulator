@@ -49,3 +49,59 @@ export function formatRefractive(strength: number, type: RefractiveType): string
   const dStr = `${sign}${Math.abs(d).toFixed(1)} D`;
   return `${dStr} · ${Math.round(pct)}%`;
 }
+
+// --- Astigmatism --------------------------------------------------------
+//
+// The cylinder (CYL) value on a real prescription is in dioptres. Clinical
+// values are commonly −0.25 to −4.00 D; we map the simulator's `magnitude`
+// slider (0..1) to 0 .. −3 D, which spans Mild / Moderate / Severe per
+// the standard severity scale (Mild < 1 D, Moderate 1–2 D, Severe 2–3 D,
+// Extreme > 3 D). Sign is always negative — the minus-cyl convention used
+// in US optometry. Source: Insight Vision Center & 1-800 Contacts severity
+// scales; AAO basic-optics chapter on astigmatic refractive error.
+//
+// The `axis` slider is already in degrees (0..180) using the TABO
+// convention (3 o'clock = 0°, anticlockwise, 90° = vertical meridian).
+// We bucket the axis into the three traditional categories optometrists
+// use to describe orientation:
+//
+//   - With-the-rule (WTR): steepest meridian vertical (axis 60°–120°).
+//     Most common in young adults.
+//   - Against-the-rule (ATR): steepest meridian horizontal
+//     (axis 0°–30° or 150°–180°). More common with age.
+//   - Oblique: in between (axis 30°–60° or 120°–150°).
+//
+// Source: Wikipedia "Astigmatism", StatPearls/NIH.
+
+const MAX_CYL_DIOPTERS = 3;
+
+export type AxisCategory = 'with-the-rule' | 'against-the-rule' | 'oblique';
+
+export function magnitudeToCylDiopters(magnitude: number): number {
+  const m = Math.max(0, Math.min(1, magnitude)) * MAX_CYL_DIOPTERS;
+  // Negative for minus-cyl convention. `+ 0` normalises -0 → +0 at zero.
+  return -m + 0;
+}
+
+export function axisCategory(axisDeg: number): AxisCategory {
+  // Normalise to [0, 180): astigmatism axes are direction-agnostic.
+  const a = ((axisDeg % 180) + 180) % 180;
+  if (a >= 60 && a <= 120) return 'with-the-rule';
+  if (a <= 30 || a >= 150) return 'against-the-rule';
+  return 'oblique';
+}
+
+/** "−1.5 D × 90° · with-the-rule" — one short line for display under
+ *  the magnitude + axis controls. Uses × per prescription notation
+ *  (e.g. "−1.50 × 090") and a typographic minus for the cylinder. */
+export function formatAstigmatism(magnitude: number, axisDeg: number): string {
+  const d = magnitudeToCylDiopters(magnitude);
+  // Round axis to whole degrees for display; the dial is integer-stepped
+  // anyway, but defend against accidental fractional inputs.
+  const axis = Math.round(((axisDeg % 180) + 180) % 180);
+  if (d === 0) {
+    return `0.0 D × ${axis}°`;
+  }
+  const dStr = `−${Math.abs(d).toFixed(1)} D`;
+  return `${dStr} × ${axis}° · ${axisCategory(axis)}`;
+}

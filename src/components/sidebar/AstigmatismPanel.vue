@@ -8,6 +8,7 @@ import type { WritableComputedRef } from 'vue';
 import { useEyeParam } from '@/composables/useEyeParam';
 import { RANGES } from '@/constants/ranges';
 
+import AstigmatismCaption from './AstigmatismCaption.vue';
 import AxisDial from './AxisDial.vue';
 import ConditionPanel from './ConditionPanel.vue';
 import PerEyeRow from './PerEyeRow.vue';
@@ -45,6 +46,7 @@ const axisRange = RANGES.astigmatism.axis;
           <AxisDial v-model="axisRight" :default-value="axisRange.default" :disabled="disabled" />
         </template>
       </PerEyeRow>
+      <AstigmatismCaption />
     </template>
   </ConditionPanel>
 </template>

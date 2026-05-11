@@ -66,6 +66,11 @@ The cornea is shaped more like a rugby ball than a sphere. Light focuses on mult
 
 **Implementation:** directional Gaussian — kernel weights stretched along the axis vector. A single-pass shader that samples along `vec2(cos(angle), sin(angle))` works fine for moderate radii.
 
+**UI annotation (post-v1):** the panel renders a per-eye caption in clinical units of the form `−1.5 D × 90° · with-the-rule`. Mapping in `src/utils/refractive.ts`:
+
+- **Cylinder (CYL):** `D = −3 × magnitude` (always negative — minus-cyl convention used in US optometry). The 0..−3 D span covers Mild (< 1 D) through the boundary of Severe (2–3 D); Extreme (> 3 D) is rare in unaided vision.
+- **Axis:** displayed in degrees using the TABO convention (3 o'clock = 0°, anticlockwise; 90° = vertical meridian). Categorised as **with-the-rule** (axis 60°–120°), **against-the-rule** (axis ≤ 30° or ≥ 150°), or **oblique** (in between). Sources: Insight Vision Center / 1-800 Contacts severity scales; Wikipedia "Astigmatism"; AAO basic-optics chapter on astigmatic refractive error.
+
 ### Presbyopia
 
 Age-related stiffening of the lens; near focus declines. Same trick as hyperopia — show a uniform blur with a different label.

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  axisCategory,
+  formatAstigmatism,
   formatRefractive,
+  magnitudeToCylDiopters,
   strengthToAcuityPercent,
   strengthToDiopters,
 } from './refractive';
@@ -74,5 +77,72 @@ describe('formatRefractive', () => {
     const out = formatRefractive(0.5, 'hyperopia');
     expect(out.startsWith('+')).toBe(true);
     expect(out).toMatch(/^\+3\.0 D · 59%$/);
+  });
+});
+
+describe('magnitudeToCylDiopters', () => {
+  it('returns 0 D at slider zero', () => {
+    expect(magnitudeToCylDiopters(0)).toBe(0);
+  });
+
+  it('reaches −3 D at slider 1.0 (boundary of severe/extreme)', () => {
+    expect(magnitudeToCylDiopters(1)).toBe(-3);
+  });
+
+  it('clamps inputs outside [0, 1]', () => {
+    expect(magnitudeToCylDiopters(-0.5)).toBe(0);
+    expect(magnitudeToCylDiopters(2)).toBe(-3);
+  });
+
+  it('is linear between endpoints', () => {
+    expect(magnitudeToCylDiopters(0.5)).toBe(-1.5);
+    expect(magnitudeToCylDiopters(0.25)).toBe(-0.75);
+  });
+});
+
+describe('axisCategory', () => {
+  it('classifies WTR around 90°', () => {
+    expect(axisCategory(60)).toBe('with-the-rule');
+    expect(axisCategory(90)).toBe('with-the-rule');
+    expect(axisCategory(120)).toBe('with-the-rule');
+  });
+
+  it('classifies ATR around 0/180°', () => {
+    expect(axisCategory(0)).toBe('against-the-rule');
+    expect(axisCategory(15)).toBe('against-the-rule');
+    expect(axisCategory(30)).toBe('against-the-rule');
+    expect(axisCategory(150)).toBe('against-the-rule');
+    expect(axisCategory(180)).toBe('against-the-rule');
+  });
+
+  it('classifies oblique between the boundaries', () => {
+    expect(axisCategory(45)).toBe('oblique');
+    expect(axisCategory(135)).toBe('oblique');
+  });
+
+  it('normalises out-of-range axes', () => {
+    // 270° wraps to 90° (axis is direction-agnostic mod 180).
+    expect(axisCategory(270)).toBe('with-the-rule');
+    expect(axisCategory(-90)).toBe('with-the-rule');
+  });
+});
+
+describe('formatAstigmatism', () => {
+  it('formats zero magnitude without category, axis still shown', () => {
+    expect(formatAstigmatism(0, 90)).toBe('0.0 D × 90°');
+  });
+
+  it('includes typographic minus, axis, and category', () => {
+    const out = formatAstigmatism(0.5, 90);
+    expect(out.startsWith('−')).toBe(true);
+    expect(out).toBe('−1.5 D × 90° · with-the-rule');
+  });
+
+  it('classifies oblique angles correctly', () => {
+    expect(formatAstigmatism(1, 45)).toBe('−3.0 D × 45° · oblique');
+  });
+
+  it('classifies horizontal angles as ATR', () => {
+    expect(formatAstigmatism(0.25, 0)).toBe('−0.8 D × 0° · against-the-rule');
   });
 });
