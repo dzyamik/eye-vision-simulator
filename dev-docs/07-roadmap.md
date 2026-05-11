@@ -394,6 +394,66 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ---
 
+## Phase 10 — Shareable URL state
+
+> **Added 2026-05-11 by user request, mid-Phase-5.** Make the entire app
+> state (slider values, enabled toggles, sync flag, view mode, current
+> sample image) round-trip through the URL so a user can copy-paste a link
+> and reproduce the exact configuration. The painted mask data is
+> deliberately excluded — it's too large for URL params; masks travel via
+> the preset JSON path (9.2).
+
+### 10.1 URL state schema
+
+- [ ] Pick an encoding strategy: a single `?s=<base64-of-json>` blob keeps
+      the schema flexible; one-param-per-condition keeps the URL human-
+      readable but rigid. Default: single base64 blob with a leading
+      schema-version field so future shape changes don't break old links.
+- [ ] Document the schema in a new `dev-docs/11-url-state.md`: which
+      fields are included, how the version field gates breaking changes,
+      what's intentionally excluded (mask data, uploaded images that live
+      only as data URLs in memory).
+
+**Acceptance:** A doc that any future contributor can read to understand
+the wire format; a tiny pure encode/decode helper that round-trips an
+EyeSettings + ViewSettings shape without loss (excluding mask).
+
+### 10.2 `useUrlSync.ts` composable
+
+- [ ] On app load: parse `window.location.search`; if `?s=` is present,
+      decode and apply to `useEyeSettingsStore` + `useViewSettingsStore`
+      + `useImageStore` (sample selection).
+- [ ] Watch the relevant stores; on change, debounce ~300 ms then write
+      `URLSearchParams` via `history.replaceState` (NOT `pushState` — back
+      button shouldn't accumulate one entry per slider tick).
+- [ ] Skip writes when the encoded string equals the current `?s=`
+      (avoids no-op `replaceState` calls during transient equal states).
+
+**Acceptance:** Editing sliders updates the URL bar live; pasting a
+copied URL into a new tab restores all settings; back-button history
+stays clean.
+
+### 10.3 "Copy link" button
+
+- [ ] Small button in `TopBar` calls `navigator.clipboard.writeText` with
+      the current URL; toast on success/failure (handles clipboard-API
+      rejections gracefully — Safari sometimes refuses without a user
+      gesture inside a Promise chain).
+
+**Acceptance:** One-click copy of the current shareable URL.
+
+### 10.4 Round-trip test
+
+- [ ] Vitest: encode → decode round-trip preserves every numeric and
+      enum field across both eyes (excluding mask).
+- [ ] Test: a stale URL with a missing-since-yesterday field decodes
+      gracefully via the schema-version gate (use the current default
+      for absent fields).
+
+**Acceptance:** Tests pass. Forward-compatibility for the lifetime of v1.
+
+---
+
 ## Out of scope for v1 (parked for v1.1+)
 
 - Webcam input.
