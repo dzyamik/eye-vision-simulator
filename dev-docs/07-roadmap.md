@@ -153,8 +153,8 @@ Goal: a Phaser canvas living inside `ImpairedView`, rendering the current image 
 
 ### 4.4 View mode toggle (stub)
 
-- [ ] `ViewModeToggle.vue` writes to `useViewSettingsStore.viewMode`.
-- [ ] Visible options: Both, Left, Right, Split. Implementation in phase 7.
+- [x] `ViewModeToggle.vue` writes to `useViewSettingsStore.viewMode`.
+- [x] Visible options: Both, Left, Right, Split. Implementation in phase 7.
 
 **Acceptance:** The toggle changes state but has no visual effect yet.
 

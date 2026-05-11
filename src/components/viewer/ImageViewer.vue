@@ -10,6 +10,7 @@ import { useToastStore } from '@/stores/toast';
 
 import ImpairedView from './ImpairedView.vue';
 import OriginalView from './OriginalView.vue';
+import ViewModeToggle from './ViewModeToggle.vue';
 
 const image = useImageStore();
 const toast = useToastStore();
@@ -78,6 +79,7 @@ function hasFiles(e: DragEvent): boolean {
     <section class="pane">
       <header class="pane-header">
         <h2 class="pane-title">Impaired</h2>
+        <ViewModeToggle />
         <span class="pane-hint">(no effects yet — Phase 6)</span>
       </header>
       <div class="pane-body">
