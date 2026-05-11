@@ -257,7 +257,7 @@ For each pipeline, the pattern is:
 
 ### 6.6 Glaucoma + retinitis pigmentosa pipelines
 
-- [ ] Vignette shader; RP uses tighter defaults and adds inside-region brightness loss.
+- [x] Vignette shader; RP uses tighter defaults and adds inside-region brightness loss.
 
 **Acceptance:** Tunnel-vision effect with adjustable radius; RP version dims the visible region too.
 

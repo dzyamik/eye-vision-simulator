@@ -27,6 +27,11 @@ import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipe
 import { disposeBlur, syncBlur } from './pipelines/BlurPipeline';
 import { disposeCataract, syncCataract } from './pipelines/CataractPipeline';
 import { disposeColorVision, syncColorVision } from './pipelines/ColorVisionPipeline';
+import { disposeGlaucoma, syncGlaucoma } from './pipelines/GlaucomaPipeline';
+import {
+  disposeRetinitisPigmentosa,
+  syncRetinitisPigmentosa,
+} from './pipelines/RetinitisPigmentosaPipeline';
 
 export const STACKING_ORDER: readonly ConditionKey[] = [
   'colorVision',
@@ -137,6 +142,30 @@ function syncCataractFromStore(eye: ReturnType<typeof useEyeSettingsStore>): voi
   });
 }
 
+function syncGlaucomaFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (camera === null) return;
+  syncGlaucoma(camera, {
+    leftActive: eye.left.glaucoma.enabled,
+    leftInnerRadius: eye.left.glaucoma.innerRadius,
+    leftSeverity: eye.left.glaucoma.severity,
+    rightActive: eye.right.glaucoma.enabled,
+    rightInnerRadius: eye.right.glaucoma.innerRadius,
+    rightSeverity: eye.right.glaucoma.severity,
+  });
+}
+
+function syncRetinitisPigmentosaFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (camera === null) return;
+  syncRetinitisPigmentosa(camera, {
+    leftActive: eye.left.retinitisPigmentosa.enabled,
+    leftTunnelRadius: eye.left.retinitisPigmentosa.tunnelRadius,
+    leftBrightnessLoss: eye.left.retinitisPigmentosa.brightnessLoss,
+    rightActive: eye.right.retinitisPigmentosa.enabled,
+    rightTunnelRadius: eye.right.retinitisPigmentosa.tunnelRadius,
+    rightBrightnessLoss: eye.right.retinitisPigmentosa.brightnessLoss,
+  });
+}
+
 export const pipelineManager: PipelineManager = {
   init(scene): void {
     if (camera !== null && stopWatch !== null) {
@@ -146,6 +175,8 @@ export const pipelineManager: PipelineManager = {
       disposeAstigmatism(camera);
       disposeColorVision(camera);
       disposeCataract(camera);
+      disposeGlaucoma(camera);
+      disposeRetinitisPigmentosa(camera);
     }
     camera = scene.cameras.main;
     const eye = useEyeSettingsStore();
@@ -184,6 +215,8 @@ export const pipelineManager: PipelineManager = {
     syncCataractFromStore(eye);
     syncBlurFromStore(eye);
     syncAstigmatismFromStore(eye);
-    // 6.6+ adds more per-condition syncs here (syncGlaucoma, syncAmd, …).
+    syncGlaucomaFromStore(eye);
+    syncRetinitisPigmentosaFromStore(eye);
+    // 6.7+ adds more per-condition syncs here (syncAmd, syncDiabeticRetinopathy, …).
   },
 };
