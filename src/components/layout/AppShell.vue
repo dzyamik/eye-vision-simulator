@@ -5,6 +5,7 @@
 
 import { ref } from 'vue';
 
+import DisclaimerBanner from './DisclaimerBanner.vue';
 import ToastStack from './ToastStack.vue';
 import TopBar from './TopBar.vue';
 
@@ -22,6 +23,7 @@ function closeSidebar(): void {
 <template>
   <div class="app-shell">
     <TopBar @toggle-sidebar="toggleSidebar" />
+    <DisclaimerBanner />
 
     <div class="main">
       <main class="viewer">
@@ -47,7 +49,7 @@ function closeSidebar(): void {
 <style scoped>
 .app-shell {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   height: 100%;
   max-width: 1400px;
   margin: 0 auto;

@@ -8,7 +8,7 @@
 // Linked-mode propagation flows through useEyeParam — toggling L's enabled
 // while sync is on flips R's enabled too.
 
-import type { WritableComputedRef } from 'vue';
+import { ref, type WritableComputedRef } from 'vue';
 
 import { useEyeParam } from '@/composables/useEyeParam';
 import type { ConditionKey } from '@/types/eyeSettings';
@@ -18,6 +18,11 @@ const props = defineProps<{
   title: string;
   info?: string;
 }>();
+
+// Inline info popover. Clicking the [?] toggles a small panel under the
+// header. Native `title` attribute also stays as a hover fallback for
+// users discovering the icon.
+const infoOpen = ref(false);
 
 // 'enabled' exists on every EyeSettings[C], but TS can't narrow that across
 // the union via one useEyeParam call. The cast is contained here.
@@ -41,8 +46,11 @@ const enabledRight = useEyeParam(
         v-if="info"
         type="button"
         class="info-btn"
-        :aria-label="`${title}: ${info}`"
+        :class="{ 'info-btn--open': infoOpen }"
+        :aria-label="`${title}: more info`"
+        :aria-expanded="infoOpen"
         :title="info"
+        @click="infoOpen = !infoOpen"
       >
         ?
       </button>
@@ -57,6 +65,7 @@ const enabledRight = useEyeParam(
         </label>
       </div>
     </header>
+    <p v-if="info && infoOpen" class="info-text">{{ info }}</p>
     <div class="body">
       <slot :disabled-left="!enabledLeft" :disabled-right="!enabledRight" />
     </div>
@@ -103,9 +112,26 @@ const enabledRight = useEyeParam(
   line-height: 1;
 }
 
-.info-btn:hover {
+.info-btn:hover,
+.info-btn--open {
   color: var(--accent);
   border-color: var(--accent);
+}
+
+.info-btn--open {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.info-text {
+  margin: 0;
+  padding: var(--pad-sm);
+  font-size: var(--t-sm);
+  line-height: 1.45;
+  color: var(--fg);
+  background: var(--bg-3);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
 }
 
 .enables {

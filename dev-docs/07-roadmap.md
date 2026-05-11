@@ -364,8 +364,8 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 9.3 Tooltips and info popovers
 
-- [ ] Every condition's `[?]` shows its description.
-- [ ] Disclaimer banner appears once at first run, dismissible.
+- [x] Every condition's `[?]` shows its description.
+- [x] Disclaimer banner appears once at first run, dismissible.
 
 **Acceptance:** No undocumented controls.
 
