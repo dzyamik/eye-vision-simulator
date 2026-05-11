@@ -95,8 +95,8 @@ Goal: a static page that loads an image into Pinia and renders it (no Phaser yet
 
 ### 3.1 `AppShell`, `TopBar`, layout grid
 
-- [ ] Two-column grid (viewer left, sidebar right), responsive per [`05-ui-ux-design.md`](./05-ui-ux-design.md).
-- [ ] `TopBar` with logo placeholder, sample-image dropdown (stub), Upload button.
+- [x] Two-column grid (viewer left, sidebar right), responsive per [`05-ui-ux-design.md`](./05-ui-ux-design.md).
+- [x] `TopBar` with logo placeholder, sample-image dropdown (stub), Upload button.
 
 **Acceptance:** Layout renders correctly at 1280×800 and 400×800 (sidebar collapses).
 
