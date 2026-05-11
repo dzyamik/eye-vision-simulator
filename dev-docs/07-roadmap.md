@@ -444,9 +444,9 @@ stays clean.
 
 ### 10.4 Round-trip test
 
-- [ ] Vitest: encode → decode round-trip preserves every numeric and
+- [x] Vitest: encode → decode round-trip preserves every numeric and
       enum field across both eyes (excluding mask).
-- [ ] Test: a stale URL with a missing-since-yesterday field decodes
+- [x] Test: a stale URL with a missing-since-yesterday field decodes
       gracefully via the schema-version gate (use the current default
       for absent fields).
 
