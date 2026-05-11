@@ -227,9 +227,9 @@ For each pipeline, the pattern is:
 
 ### 6.2 Blur pipeline (myopia / hyperopia / presbyopia)
 
-- [ ] `BlurPipeline.ts` with two-pass separable Gaussian.
-- [ ] One instance per eye combined-blur (sum of myopia + hyperopia + presbyopia strengths, clamped).
-- [ ] Wired into `syncFromStore`.
+- [x] `BlurPipeline.ts` with two-pass separable Gaussian.
+- [x] One instance per eye combined-blur (sum of myopia + hyperopia + presbyopia strengths, clamped).
+- [x] Wired into `syncFromStore`.
 
 **Acceptance:** Dragging the Myopia strength slider on either eye produces visible blur within one frame.
 

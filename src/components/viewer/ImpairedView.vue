@@ -7,6 +7,7 @@ import { storeToRefs } from 'pinia';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 import { usePhaser } from '@/composables/usePhaser';
+import { pipelineManager } from '@/phaser/pipelineManager';
 import { useImageStore } from '@/stores/image';
 
 const container = ref<HTMLDivElement | null>(null);
@@ -17,6 +18,10 @@ onMounted(async () => {
   if (container.value === null) return;
   phaser = usePhaser(container.value);
   await phaser.gameReady;
+  const scene = phaser.getScene();
+  if (scene !== null) {
+    pipelineManager.init(scene);
+  }
   if (current.value !== null) {
     phaser.setImage(current.value.src);
   }
