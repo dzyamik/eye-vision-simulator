@@ -8,6 +8,7 @@ import { computed, ref } from 'vue';
 
 import type { EyeSettings } from '@/types/eyeSettings';
 import { createDefaultEyeSettings } from '@/types/eyeSettings';
+import { deepClone } from '@/utils/clone';
 
 export type EyeSide = 'left' | 'right';
 
@@ -28,7 +29,7 @@ export const useEyeSettingsStore = defineStore('eyeSettings', () => {
   function copy(from: EyeSide, to: EyeSide): void {
     if (from === to) return;
     const src = (from === 'left' ? left : right).value;
-    (to === 'left' ? left : right).value = structuredClone(src);
+    (to === 'left' ? left : right).value = deepClone(src);
   }
 
   // Returns a function so callers can ask per-eye without two computeds.

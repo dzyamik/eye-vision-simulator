@@ -82,8 +82,8 @@ Goal: get the data model in place before any UI.
 
 ### 2.4 Unit tests for stores (optional)
 
-- [ ] Set up Vitest.
-- [ ] Test: reset clears one eye, leaves the other; copy duplicates; linked mode propagates.
+- [x] Set up Vitest.
+- [x] Test: reset clears one eye, leaves the other; copy duplicates; linked mode propagates.
 
 **Acceptance:** Tests pass. (Skip the whole step if Vitest isn't desired.)
 

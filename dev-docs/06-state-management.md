@@ -103,6 +103,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { EyeSettings, ConditionKey } from '@/types/eyeSettings';
 import { createDefaultEyeSettings } from '@/types/eyeSettings';
+import { deepClone } from '@/utils/clone';
 
 export const useEyeSettingsStore = defineStore('eyeSettings', () => {
   const left = ref<EyeSettings>(createDefaultEyeSettings());
@@ -118,9 +119,10 @@ export const useEyeSettingsStore = defineStore('eyeSettings', () => {
   }
   function copy(from: 'left' | 'right', to: 'left' | 'right') {
     if (from === to) return;
-    // deep clone via structuredClone (mask data is a typed array)
+    // deepClone unwraps Vue's reactive proxies before structuredClone
+    // (which throws DataCloneError on Proxies). See src/utils/clone.ts.
     const src = (from === 'left' ? left : right).value;
-    (to === 'left' ? left : right).value = structuredClone(src);
+    (to === 'left' ? left : right).value = deepClone(src);
   }
 
   const anyEnabled = computed(() => (eye: 'left' | 'right') => {
@@ -131,6 +133,13 @@ export const useEyeSettingsStore = defineStore('eyeSettings', () => {
   return { left, right, linked, resetEye, resetAll, copy, anyEnabled };
 });
 ```
+
+> **Why `deepClone` instead of `structuredClone` directly?** Pinia setup
+> stores wrap state in deeply-reactive Vue Proxies. `structuredClone` walks
+> the object via internal slots that Proxies don't forward, throwing
+> `DataCloneError`. Our `src/utils/clone.ts` uses `toRaw` to unwrap proxies
+> at every level, then delegates to `structuredClone` so binary payloads
+> (e.g. `ImageData` in `customMask.maskData`) are still copied correctly.
 
 **Why a setup-style store?** Better ref inference with TS, and the per-eye structure plays nicely with `watch()` from the bridge.
 
@@ -197,8 +206,8 @@ export const usePresetsStore = defineStore('presets', () => {
 
   function load(preset: Preset) {
     const eye = useEyeSettingsStore();
-    eye.left = structuredClone(preset.left);
-    eye.right = structuredClone(preset.right);
+    eye.left = deepClone(preset.left);
+    eye.right = deepClone(preset.right);
   }
   function saveCurrent(name: string): Preset {
     /* ... */

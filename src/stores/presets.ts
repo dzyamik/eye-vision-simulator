@@ -8,6 +8,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 import type { EyeSettings } from '@/types/eyeSettings';
+import { deepClone } from '@/utils/clone';
 
 import { useEyeSettingsStore } from './eyeSettings';
 
@@ -25,8 +26,8 @@ export const usePresetsStore = defineStore('presets', () => {
 
   function load(preset: Preset): void {
     const eye = useEyeSettingsStore();
-    eye.left = structuredClone(preset.left);
-    eye.right = structuredClone(preset.right);
+    eye.left = deepClone(preset.left);
+    eye.right = deepClone(preset.right);
   }
 
   function saveCurrent(name: string): Preset {
