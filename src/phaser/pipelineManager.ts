@@ -25,6 +25,7 @@ import type { ConditionKey, EyeSettings } from '@/types/eyeSettings';
 
 import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipeline';
 import { disposeBlur, syncBlur } from './pipelines/BlurPipeline';
+import { disposeColorVision, syncColorVision } from './pipelines/ColorVisionPipeline';
 
 export const STACKING_ORDER: readonly ConditionKey[] = [
   'colorVision',
@@ -109,6 +110,18 @@ function syncAstigmatismFromStore(eye: ReturnType<typeof useEyeSettingsStore>): 
   });
 }
 
+function syncColorVisionFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (camera === null) return;
+  syncColorVision(camera, {
+    leftActive: eye.left.colorVision.enabled,
+    leftType: eye.left.colorVision.type,
+    leftSeverity: eye.left.colorVision.severity,
+    rightActive: eye.right.colorVision.enabled,
+    rightType: eye.right.colorVision.type,
+    rightSeverity: eye.right.colorVision.severity,
+  });
+}
+
 export const pipelineManager: PipelineManager = {
   init(scene): void {
     if (camera !== null && stopWatch !== null) {
@@ -116,6 +129,7 @@ export const pipelineManager: PipelineManager = {
       stopWatch();
       disposeBlur(camera);
       disposeAstigmatism(camera);
+      disposeColorVision(camera);
     }
     camera = scene.cameras.main;
     const eye = useEyeSettingsStore();
@@ -145,9 +159,14 @@ export const pipelineManager: PipelineManager = {
   syncFromStore(): void {
     if (camera === null) return;
     const eye = useEyeSettingsStore();
+    // STACKING_ORDER says colorVision runs first; we call it first here, but
+    // Phaser actually runs filters in the order they were attached, which
+    // depends on activation timing. A future cleanup will sort camera.filters
+    // by STACKING_ORDER. For now color-then-blur visually approximates the
+    // intended pipeline.
+    syncColorVisionFromStore(eye);
     syncBlurFromStore(eye);
     syncAstigmatismFromStore(eye);
-    // 6.4+ adds more per-condition syncs here (syncColorVision,
-    // syncCataract, syncGlaucoma, …).
+    // 6.5+ adds more per-condition syncs here (syncCataract, syncGlaucoma, …).
   },
 };

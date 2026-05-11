@@ -242,8 +242,8 @@ For each pipeline, the pattern is:
 
 ### 6.4 Color vision pipeline
 
-- [ ] Matrix-based shader with sRGB→linear→matrix→sRGB.
-- [ ] Type select switches the matrix; severity mixes with identity.
+- [x] Matrix-based shader with sRGB→linear→matrix→sRGB.
+- [x] Type select switches the matrix; severity mixes with identity.
 
 **Acceptance:** Switching to "deuteranopia" with severity=1.0 produces a recognizably red/green-confused output. Compare against the reference matrices in `04-shaders-reference.md`.
 
