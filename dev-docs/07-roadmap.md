@@ -173,9 +173,9 @@ Goal: full sidebar UI with all sliders and toggles, wired to Pinia. Still no sha
 
 ### 5.2 Generic `ConditionPanel.vue`
 
-- [ ] Props: `condition: ConditionKey`, `title`, parameter slots.
-- [ ] Renders the enabled toggle, title, optional `[?]` info popover, and slots for sliders.
-- [ ] Sliders use a custom `<RangeInput>` component (label + range + numeric input + reset-to-default button).
+- [x] Props: `condition: ConditionKey`, `title`, parameter slots.
+- [x] Renders the enabled toggle, title, optional `[?]` info popover, and slots for sliders.
+- [x] Sliders use a custom `<RangeInput>` component (label + range + numeric input + reset-to-default button).
 
 **Acceptance:** A reference implementation for one condition (Myopia) is visible and editable. Slider drags update the store; toggling enabled greys out the slider.
 
