@@ -23,6 +23,7 @@ import { watch } from 'vue';
 import { useEyeSettingsStore } from '@/stores/eyeSettings';
 import type { ConditionKey, EyeSettings } from '@/types/eyeSettings';
 
+import { disposeAmd, syncAmd } from './pipelines/AmdPipeline';
 import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipeline';
 import { disposeBlur, syncBlur } from './pipelines/BlurPipeline';
 import { disposeCataract, syncCataract } from './pipelines/CataractPipeline';
@@ -60,6 +61,7 @@ export interface PipelineManager {
 }
 
 let camera: Phaser.Cameras.Scene2D.Camera | null = null;
+let scene: Phaser.Scene | null = null;
 let stopWatch: (() => void) | null = null;
 
 function clamp01(n: number): number {
@@ -166,8 +168,22 @@ function syncRetinitisPigmentosaFromStore(eye: ReturnType<typeof useEyeSettingsS
   });
 }
 
+function syncAmdFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (camera === null || scene === null) return;
+  syncAmd(scene, camera, {
+    leftActive: eye.left.amd.enabled,
+    leftScotomaRadius: eye.left.amd.scotomaRadius,
+    leftFalloff: eye.left.amd.falloff,
+    leftDistortion: eye.left.amd.distortion,
+    rightActive: eye.right.amd.enabled,
+    rightScotomaRadius: eye.right.amd.scotomaRadius,
+    rightFalloff: eye.right.amd.falloff,
+    rightDistortion: eye.right.amd.distortion,
+  });
+}
+
 export const pipelineManager: PipelineManager = {
-  init(scene): void {
+  init(sceneArg): void {
     if (camera !== null && stopWatch !== null) {
       // Re-init: tear down the old watcher + filters so we don't double-up.
       stopWatch();
@@ -177,8 +193,10 @@ export const pipelineManager: PipelineManager = {
       disposeCataract(camera);
       disposeGlaucoma(camera);
       disposeRetinitisPigmentosa(camera);
+      disposeAmd(camera);
     }
-    camera = scene.cameras.main;
+    scene = sceneArg;
+    camera = sceneArg.cameras.main;
     const eye = useEyeSettingsStore();
     stopWatch = watch(
       () => [eye.left, eye.right] as [EyeSettings, EyeSettings],
@@ -215,8 +233,9 @@ export const pipelineManager: PipelineManager = {
     syncCataractFromStore(eye);
     syncBlurFromStore(eye);
     syncAstigmatismFromStore(eye);
+    syncAmdFromStore(eye);
     syncGlaucomaFromStore(eye);
     syncRetinitisPigmentosaFromStore(eye);
-    // 6.7+ adds more per-condition syncs here (syncAmd, syncDiabeticRetinopathy, …).
+    // 6.8+ adds more per-condition syncs here (syncDiabeticRetinopathy, …).
   },
 };

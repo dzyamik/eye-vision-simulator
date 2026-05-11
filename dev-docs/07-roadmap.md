@@ -263,7 +263,7 @@ For each pipeline, the pattern is:
 
 ### 6.7 AMD pipeline
 
-- [ ] Central scotoma + optional UV distortion via noise.
+- [x] Central scotoma + optional UV distortion via noise.
 
 **Acceptance:** With distortion=1.0, straight lines in the image visibly bend near the center.
 
