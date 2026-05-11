@@ -102,8 +102,8 @@ Goal: a static page that loads an image into Pinia and renders it (no Phaser yet
 
 ### 3.2 `ImageViewer` and `OriginalView`
 
-- [ ] Stack original on top, impaired placeholder beneath.
-- [ ] `OriginalView` renders `<img :src="image.current.src">`, `object-fit: contain`, fills its container.
+- [x] Stack original on top, impaired placeholder beneath.
+- [x] `OriginalView` renders `<img :src="image.current.src">`, `object-fit: contain`, fills its container.
 
 **Acceptance:** When `useImageStore.current` is set to a sample image, it renders in the top viewer.
 

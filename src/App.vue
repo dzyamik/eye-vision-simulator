@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import AppShell from '@/components/layout/AppShell.vue';
+import ImageViewer from '@/components/viewer/ImageViewer.vue';
 </script>
 
 <template>
   <AppShell>
     <template #viewer>
-      <div class="placeholder placeholder--viewer">
-        <p>Viewer area</p>
-        <p class="hint">Original + impaired views land in step 3.2.</p>
-      </div>
+      <ImageViewer />
     </template>
 
     <template #sidebar>
-      <div class="placeholder placeholder--sidebar">
+      <div class="placeholder">
         <p>Sidebar area</p>
         <p class="hint">Eye selector + condition panels land in Phase 5.</p>
       </div>
@@ -27,18 +25,12 @@ import AppShell from '@/components/layout/AppShell.vue';
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 100%;
-  min-height: 200px;
+  min-height: 120px;
   color: var(--fg-dim);
   border: 1px dashed var(--border);
   border-radius: var(--radius);
   padding: var(--pad-lg);
   gap: var(--pad-sm);
-}
-
-.placeholder--sidebar {
-  height: auto;
-  min-height: 120px;
   margin: var(--pad);
 }
 
