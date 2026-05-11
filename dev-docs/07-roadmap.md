@@ -405,11 +405,11 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 10.1 URL state schema
 
-- [ ] Pick an encoding strategy: a single `?s=<base64-of-json>` blob keeps
+- [x] Pick an encoding strategy: a single `?s=<base64-of-json>` blob keeps
       the schema flexible; one-param-per-condition keeps the URL human-
       readable but rigid. Default: single base64 blob with a leading
       schema-version field so future shape changes don't break old links.
-- [ ] Document the schema in a new `dev-docs/11-url-state.md`: which
+- [x] Document the schema in a new `dev-docs/11-url-state.md`: which
       fields are included, how the version field gates breaking changes,
       what's intentionally excluded (mask data, uploaded images that live
       only as data URLs in memory).
