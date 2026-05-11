@@ -66,10 +66,10 @@ Goal: get the data model in place before any UI.
 
 ### 2.2 Implement Pinia stores
 
-- [ ] `useEyeSettingsStore` with left/right/linked + reset/copy.
-- [ ] `useViewSettingsStore` with activeEye and viewMode.
-- [ ] `useImageStore` with sample list and file loader.
-- [ ] `usePresetsStore` skeleton (built-in list empty for now).
+- [x] `useEyeSettingsStore` with left/right/linked + reset/copy.
+- [x] `useViewSettingsStore` with activeEye and viewMode.
+- [x] `useImageStore` with sample list and file loader.
+- [x] `usePresetsStore` skeleton (built-in list empty for now).
 
 **Acceptance:** Stores instantiate without errors; their `state` shapes match the docs; basic actions don't throw.
 
