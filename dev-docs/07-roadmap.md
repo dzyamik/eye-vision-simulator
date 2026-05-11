@@ -435,7 +435,7 @@ stays clean.
 
 ### 10.3 "Copy link" button
 
-- [ ] Small button in `TopBar` calls `navigator.clipboard.writeText` with
+- [x] Small button in `TopBar` calls `navigator.clipboard.writeText` with
       the current URL; toast on success/failure (handles clipboard-API
       rejections gracefully — Safari sometimes refuses without a user
       gesture inside a Promise chain).

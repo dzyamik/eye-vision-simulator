@@ -45,6 +45,19 @@ function onSampleChange(e: Event): void {
   const sample = sampleImages.value.find((s) => s.filename === filename);
   if (sample) image.setFromSample(sample);
 }
+
+async function onCopyLink(): Promise<void> {
+  // navigator.clipboard.writeText can reject (Safari sometimes refuses
+  // outside a "user activation" context, file:// origins, blocked by
+  // permissions-policy). Fall back to a clear error toast — better than
+  // a silent failure.
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    toast.push('Link copied to clipboard.');
+  } catch (err) {
+    toast.push(`Couldn't copy link: ${(err as Error).message}`, { type: 'error' });
+  }
+}
 </script>
 
 <template>
@@ -93,6 +106,7 @@ function onSampleChange(e: Event): void {
         @change="onPicked"
       />
       <button type="button" class="upload" @click="openPicker">Upload</button>
+      <button type="button" class="upload" @click="onCopyLink">Copy link</button>
     </div>
   </header>
 </template>
