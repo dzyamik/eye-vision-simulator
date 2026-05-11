@@ -28,6 +28,10 @@ import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipe
 import { disposeBlur, syncBlur } from './pipelines/BlurPipeline';
 import { disposeCataract, syncCataract } from './pipelines/CataractPipeline';
 import { disposeColorVision, syncColorVision } from './pipelines/ColorVisionPipeline';
+import {
+  disposeDiabeticRetinopathy,
+  syncDiabeticRetinopathy,
+} from './pipelines/DiabeticRetinopathyPipeline';
 import { disposeGlaucoma, syncGlaucoma } from './pipelines/GlaucomaPipeline';
 import {
   disposeRetinitisPigmentosa,
@@ -182,6 +186,20 @@ function syncAmdFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
   });
 }
 
+function syncDrFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+  if (camera === null || scene === null) return;
+  syncDiabeticRetinopathy(scene, camera, {
+    leftActive: eye.left.diabeticRetinopathy.enabled,
+    leftSpotCount: eye.left.diabeticRetinopathy.spotCount,
+    leftSpotSize: eye.left.diabeticRetinopathy.spotSize,
+    leftSeverity: eye.left.diabeticRetinopathy.severity,
+    rightActive: eye.right.diabeticRetinopathy.enabled,
+    rightSpotCount: eye.right.diabeticRetinopathy.spotCount,
+    rightSpotSize: eye.right.diabeticRetinopathy.spotSize,
+    rightSeverity: eye.right.diabeticRetinopathy.severity,
+  });
+}
+
 export const pipelineManager: PipelineManager = {
   init(sceneArg): void {
     if (camera !== null && stopWatch !== null) {
@@ -194,6 +212,7 @@ export const pipelineManager: PipelineManager = {
       disposeGlaucoma(camera);
       disposeRetinitisPigmentosa(camera);
       disposeAmd(camera);
+      disposeDiabeticRetinopathy(camera);
     }
     scene = sceneArg;
     camera = sceneArg.cameras.main;
@@ -236,6 +255,8 @@ export const pipelineManager: PipelineManager = {
     syncAmdFromStore(eye);
     syncGlaucomaFromStore(eye);
     syncRetinitisPigmentosaFromStore(eye);
-    // 6.8+ adds more per-condition syncs here (syncDiabeticRetinopathy, …).
+    syncDrFromStore(eye);
+    // 6.9+ adds sprite-based effects (floaters, migraine aura) and the
+    // custom mask (8.x), which sit on top of the filter stack.
   },
 };

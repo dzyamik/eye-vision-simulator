@@ -269,8 +269,8 @@ For each pipeline, the pattern is:
 
 ### 6.8 Diabetic retinopathy pipeline
 
-- [ ] Seeded-RNG spot positions in JS; uniform array uploaded to the shader.
-- [ ] `spotCount` and `spotSize` changes regenerate positions stably.
+- [x] Seeded-RNG spot positions in JS; uniform array uploaded to the shader.
+- [x] `spotCount` and `spotSize` changes regenerate positions stably.
 
 **Acceptance:** Spots don't randomly jump on minor parameter tweaks; severity slider darkens them.
 
