@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output — NOTE: docs/ is intentionally NOT ignored.
+# Vite builds into docs/ and GitHub Pages serves from that folder.
+# If you change the build target, update this file and vite.config.ts together.
+dist/
+build/
+
+# Vite cache
+.vite/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+
+# Claude Code (user-local; tooling like .claude/commands/ and .claude/skills/ stays tracked)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# Misc
+*.tmp
+*.bak
