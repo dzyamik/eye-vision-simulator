@@ -379,9 +379,9 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 9.5 Empty / error states
 
-- [ ] No image: friendly placeholder.
-- [ ] WebGL unsupported: graceful message.
-- [ ] Image load failure: toast.
+- [x] No image: friendly placeholder.
+- [x] WebGL unsupported: graceful message.
+- [x] Image load failure: toast.
 
 **Acceptance:** Every state is handled visibly; no console errors in normal flows.
 

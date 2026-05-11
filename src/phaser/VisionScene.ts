@@ -205,8 +205,11 @@ export class VisionScene extends Phaser.Scene {
       this.applyTexture(key);
     });
     this.load.once('loaderror', (file: Phaser.Loader.File) => {
-      // Phaser's own loader logs the error; we just unblock the next load.
+      // Bubbled up to ImpairedView (which listens via scene.events) and
+      // turned into a toast. A console.error stays useful for devtools
+      // debugging.
       console.error('VisionScene image load failed:', file.src);
+      this.events.emit('image-load-error', { src: file.src });
     });
     this.load.start();
   }
