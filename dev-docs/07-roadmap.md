@@ -199,8 +199,8 @@ Goal: full sidebar UI with all sliders and toggles, wired to Pinia. Still no sha
 
 ### 5.5 Astigmatism axis dial
 
-- [ ] A circular control component that lets users drag to set the axis (0–180°).
-- [ ] Syncs with the numeric input.
+- [x] A circular control component that lets users drag to set the axis (0–180°).
+- [x] Syncs with the numeric input.
 
 **Acceptance:** Dragging the dial updates the angle; the numeric input updates simultaneously.
 
