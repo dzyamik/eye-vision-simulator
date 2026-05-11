@@ -116,6 +116,7 @@ export const useEyeSettingsStore = defineStore('eyeSettings', () => {
   function resetAll() {
     left.value = createDefaultEyeSettings();
     right.value = createDefaultEyeSettings();
+    linked.value = false; // sync flag is part of "all"
   }
   function copy(from: 'left' | 'right', to: 'left' | 'right') {
     if (from === to) return;

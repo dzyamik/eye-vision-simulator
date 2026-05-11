@@ -3,10 +3,23 @@
 // copy one eye's full settings to the other. No confirm dialog in v1 — the
 // per-slider ↺ button on every RangeInput is the granular undo path; reset
 // is the all-at-once nuke for one side.
+//
+// "Reset all" wipes both eyes + sync + view mode AND strips ?s= from the
+// URL so a clean state is also a clean address bar (until the user changes
+// something again, at which point URL syncing resumes normally).
 
+import { clearUrlState } from '@/composables/useUrlSync';
 import { useEyeSettingsStore } from '@/stores/eyeSettings';
+import { useViewSettingsStore } from '@/stores/viewSettings';
 
 const eye = useEyeSettingsStore();
+const view = useViewSettingsStore();
+
+function resetAll(): void {
+  eye.resetAll();
+  view.viewMode = 'both';
+  clearUrlState();
+}
 </script>
 
 <template>
@@ -23,6 +36,11 @@ const eye = useEyeSettingsStore();
       <button type="button" class="btn" @click="eye.resetEye('right')">Reset</button>
       <button type="button" class="btn" @click="eye.copy('right', 'left')">
         Copy → L
+      </button>
+    </div>
+    <div class="row row--all">
+      <button type="button" class="btn btn--all" @click="resetAll">
+        Reset all &amp; clear URL
       </button>
     </div>
   </div>
@@ -66,5 +84,16 @@ const eye = useEyeSettingsStore();
 .btn:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.row--all {
+  grid-template-columns: 1fr;
+  margin-top: 2px;
+  padding-top: var(--pad-sm);
+  border-top: 1px dashed var(--border);
+}
+
+.btn--all {
+  width: 100%;
 }
 </style>

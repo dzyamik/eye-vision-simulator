@@ -24,6 +24,7 @@ export const useEyeSettingsStore = defineStore('eyeSettings', () => {
   function resetAll(): void {
     left.value = createDefaultEyeSettings();
     right.value = createDefaultEyeSettings();
+    linked.value = false;
   }
 
   function copy(from: EyeSide, to: EyeSide): void {

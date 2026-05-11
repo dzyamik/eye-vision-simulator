@@ -137,6 +137,20 @@ function scheduleWrite(): void {
   }, DEBOUNCE_MS);
 }
 
+/** Removes `?s=` from the address bar and re-syncs the internal guard
+ *  so the post-tick scheduleWrite (which fires from the just-mutated
+ *  stores that triggered the reset) doesn't immediately re-write an
+ *  equivalent URL. The URL stays cleared until the user changes
+ *  something meaningful, at which point normal syncing resumes. */
+export function clearUrlState(): void {
+  const params = new URLSearchParams(window.location.search);
+  params.delete(URL_STATE_PARAM);
+  const qs = params.toString();
+  const newUrl = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+  window.history.replaceState(null, '', newUrl);
+  lastWrittenBlob = encode(snapshot());
+}
+
 interface UrlSyncHandle {
   applyFromCurrentUrl(): boolean;
 }

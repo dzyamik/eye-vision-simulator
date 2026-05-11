@@ -43,9 +43,12 @@ export const useImageStore = defineStore('image', () => {
     current.value = s;
   }
 
-  // Fetched once at app start (App.vue's onMounted). Sets the first sample
-  // as the default if no image has been chosen yet, so the user never lands
-  // on an empty viewer.
+  // Fetched once at app start (App.vue's onMounted). Loads the manifest
+  // only — it does NOT touch `current`, so the caller can apply URL state
+  // first and fall back to the default via `ensureDefaultImage()` only if
+  // nothing was selected. The old behaviour (setting default inside this
+  // function) caused two writes to `current` when a URL state was present,
+  // racing two Phaser texture loads against each other.
   async function loadSampleManifest(): Promise<void> {
     const res = await fetch(MANIFEST_URL);
     if (!res.ok) {
@@ -59,10 +62,23 @@ export const useImageStore = defineStore('image', () => {
       filename: e.filename,
       name: e.name,
     }));
+  }
+
+  /** Picks the first bundled sample as the default if no image has been
+   *  chosen yet — so the user never lands on an empty viewer. Idempotent;
+   *  safe to call repeatedly. */
+  function ensureDefaultImage(): void {
     if (current.value === null && sampleImages.value.length > 0) {
       current.value = sampleImages.value[0]!;
     }
   }
 
-  return { current, sampleImages, setFromFile, setFromSample, loadSampleManifest };
+  return {
+    current,
+    sampleImages,
+    setFromFile,
+    setFromSample,
+    loadSampleManifest,
+    ensureDefaultImage,
+  };
 });

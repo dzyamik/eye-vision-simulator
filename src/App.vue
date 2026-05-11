@@ -34,10 +34,15 @@ onMounted(async () => {
   } catch (err) {
     toast.push(`Sample images failed to load: ${(err as Error).message}`, { type: 'error' });
   }
-  // useUrlSync() registers the watcher; applyFromCurrentUrl applies any
-  // ?s= blob in the address bar. Order matters — sample manifest must be
-  // loaded first so a sample-by-filename lookup in the URL state can hit.
+  // Order matters and is load-bearing:
+  //   1. manifest fetched (sample-by-filename lookup needs it).
+  //   2. URL state applied — this may set `image.current` to a sample.
+  //   3. ensureDefaultImage — only sets `current` if (2) didn't.
+  // Doing (3) before (2) caused both writes to fire, racing two Phaser
+  // texture loads and intermittently leaving the impaired view on the
+  // default sample even when the URL pointed at a specific one.
   useUrlSync().applyFromCurrentUrl();
+  image.ensureDefaultImage();
 });
 </script>
 

@@ -61,6 +61,13 @@ describe('useEyeSettingsStore', () => {
       expect(store.right.amd.enabled).toBe(false);
       expect(store.right.amd.scotomaRadius).toBe(0);
     });
+
+    it('also resets the sync flag', () => {
+      const store = useEyeSettingsStore();
+      store.linked = true;
+      store.resetAll();
+      expect(store.linked).toBe(false);
+    });
   });
 
   describe('copy', () => {

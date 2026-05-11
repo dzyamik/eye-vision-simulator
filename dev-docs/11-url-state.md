@@ -87,8 +87,10 @@ The sample's `filename` rather than its full `src` is stored, and on decode we l
 ## How it integrates
 
 - **On app load** (`useUrlSync` composable, Phase 10.2): parse `window.location.search`; if `?s=` is present, decode and apply to `useEyeSettingsStore` + `useViewSettingsStore` (+ `useImageStore.setFromSample` if a known sample matches).
+  - Order is load-bearing: `image.loadSampleManifest()` → `applyFromCurrentUrl()` → `image.ensureDefaultImage()`. Doing the default-image step before URL apply (the original implementation) caused two writes to `image.current` and raced two Phaser texture loads, so the impaired view sometimes stuck on the default sample while the original view showed the URL's sample. The split keeps writes to one per launch.
 - **On state change**: watch the same stores, debounce ~300 ms, call `history.replaceState` (NOT `pushState` — back button shouldn't accumulate one entry per slider tick) with the new `?s=` value.
 - **`Copy link` button** in `TopBar` (Phase 10.3): `navigator.clipboard.writeText(window.location.href)`.
+- **`Reset all & clear URL` button** in `EyeActions`: resets both eyes + sync flag + view mode, then calls `clearUrlState()` to strip `?s=` from the address bar. `lastWrittenBlob` is re-synced to the post-reset snapshot so the watcher's next post-tick fire doesn't immediately re-write an equivalent URL; the address bar stays clean until the user meaningfully changes something.
 
 ## Size budget (informational)
 
