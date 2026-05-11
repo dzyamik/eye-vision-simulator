@@ -55,7 +55,8 @@ interface DrParams {
   rightSeverity: number;
 }
 
-let filter: Phaser.Filters.Blend | null = null;
+const filters = new WeakMap<Phaser.Cameras.Scene2D.Camera, Phaser.Filters.Blend>();
+// Texture cache is global — one canvas shared across cameras.
 let lastSpotCount = -1;
 let lastSpotSize = -1;
 
@@ -109,6 +110,8 @@ export function syncDiabeticRetinopathy(
   const severity = (params.leftSeverity + params.rightSeverity) / 2;
   const effective = anyActive && spotCount > 0 && severity > ACTIVE_THRESHOLD;
 
+  let filter = filters.get(camera) ?? null;
+
   if (effective) {
     const tex = ensureTexture(scene);
     if (spotCount !== lastSpotCount || spotSize !== lastSpotSize) {
@@ -123,19 +126,19 @@ export function syncDiabeticRetinopathy(
         severity,
         [0, 0, 0, 1],
       );
+      filters.set(camera, filter);
     }
     filter.amount = severity;
   } else if (filter !== null) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
 }
 
 export function disposeDiabeticRetinopathy(camera: Phaser.Cameras.Scene2D.Camera): void {
-  if (filter !== null) {
+  const filter = filters.get(camera);
+  if (filter !== undefined) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
-  lastSpotCount = -1;
-  lastSpotSize = -1;
 }

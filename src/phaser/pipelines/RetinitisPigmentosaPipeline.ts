@@ -25,8 +25,20 @@ interface RpParams {
   rightBrightnessLoss: number;
 }
 
-let matrix: Phaser.Filters.ColorMatrix | null = null;
-let vignette: Phaser.Filters.Vignette | null = null;
+interface RpFilters {
+  matrix: Phaser.Filters.ColorMatrix | null;
+  vignette: Phaser.Filters.Vignette | null;
+}
+const filters = new WeakMap<Phaser.Cameras.Scene2D.Camera, RpFilters>();
+
+function getOrInit(camera: Phaser.Cameras.Scene2D.Camera): RpFilters {
+  let entry = filters.get(camera);
+  if (entry === undefined) {
+    entry = { matrix: null, vignette: null };
+    filters.set(camera, entry);
+  }
+  return entry;
+}
 
 function buildBrightnessMatrix(scale: number): number[] {
   return [
@@ -44,45 +56,42 @@ export function syncRetinitisPigmentosa(
   const anyActive = params.leftActive || params.rightActive;
   const radius = (params.leftTunnelRadius + params.rightTunnelRadius) / 2;
   const brightnessLoss = (params.leftBrightnessLoss + params.rightBrightnessLoss) / 2;
-  const effective = anyActive;
+  const entry = getOrInit(camera);
 
-  if (effective) {
+  if (anyActive) {
     if (brightnessLoss > ACTIVE_THRESHOLD) {
       const scale = 1 - brightnessLoss;
-      if (matrix === null) {
-        matrix = camera.filters.internal.addColorMatrix();
+      if (entry.matrix === null) {
+        entry.matrix = camera.filters.internal.addColorMatrix();
       }
-      matrix.colorMatrix.set(buildBrightnessMatrix(scale));
-      matrix.colorMatrix.alpha = 1;
-    } else if (matrix !== null) {
-      camera.filters.internal.remove(matrix);
-      matrix = null;
+      entry.matrix.colorMatrix.set(buildBrightnessMatrix(scale));
+      entry.matrix.colorMatrix.alpha = 1;
+    } else if (entry.matrix !== null) {
+      camera.filters.internal.remove(entry.matrix);
+      entry.matrix = null;
     }
 
-    if (vignette === null) {
-      vignette = camera.filters.internal.addVignette(0.5, 0.5, radius, VIGNETTE_STRENGTH);
+    if (entry.vignette === null) {
+      entry.vignette = camera.filters.internal.addVignette(0.5, 0.5, radius, VIGNETTE_STRENGTH);
     }
-    vignette.radius = radius;
-    vignette.strength = VIGNETTE_STRENGTH;
+    entry.vignette.radius = radius;
+    entry.vignette.strength = VIGNETTE_STRENGTH;
   } else {
-    if (matrix !== null) {
-      camera.filters.internal.remove(matrix);
-      matrix = null;
+    if (entry.matrix !== null) {
+      camera.filters.internal.remove(entry.matrix);
+      entry.matrix = null;
     }
-    if (vignette !== null) {
-      camera.filters.internal.remove(vignette);
-      vignette = null;
+    if (entry.vignette !== null) {
+      camera.filters.internal.remove(entry.vignette);
+      entry.vignette = null;
     }
   }
 }
 
 export function disposeRetinitisPigmentosa(camera: Phaser.Cameras.Scene2D.Camera): void {
-  if (matrix !== null) {
-    camera.filters.internal.remove(matrix);
-    matrix = null;
-  }
-  if (vignette !== null) {
-    camera.filters.internal.remove(vignette);
-    vignette = null;
-  }
+  const entry = filters.get(camera);
+  if (entry === undefined) return;
+  if (entry.matrix !== null) camera.filters.internal.remove(entry.matrix);
+  if (entry.vignette !== null) camera.filters.internal.remove(entry.vignette);
+  filters.delete(camera);
 }

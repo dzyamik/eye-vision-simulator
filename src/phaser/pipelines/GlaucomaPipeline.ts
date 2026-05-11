@@ -22,37 +22,35 @@ interface GlaucomaParams {
   rightSeverity: number;
 }
 
-let filter: Phaser.Filters.Vignette | null = null;
+const filters = new WeakMap<Phaser.Cameras.Scene2D.Camera, Phaser.Filters.Vignette>();
 
 export function syncGlaucoma(
   camera: Phaser.Cameras.Scene2D.Camera,
   params: GlaucomaParams,
 ): void {
   const anyActive = params.leftActive || params.rightActive;
-  // Phase 6 averages both eyes; Phase 7's view modes split per side.
-  // For radius we average; for severity we average too. When only one side
-  // is active, the other contributes 0 to severity (so anti-correlation
-  // collapses to that side's value at half strength). This is acceptable
-  // for the blend-both-eyes default view; per-eye fidelity arrives in 7.x.
   const radius = (params.leftInnerRadius + params.rightInnerRadius) / 2;
   const severity = (params.leftSeverity + params.rightSeverity) / 2;
   const effective = anyActive && severity > ACTIVE_THRESHOLD;
+  let filter = filters.get(camera) ?? null;
 
   if (effective) {
     if (filter === null) {
       filter = camera.filters.internal.addVignette(0.5, 0.5, radius, severity);
+      filters.set(camera, filter);
     }
     filter.radius = radius;
     filter.strength = severity;
   } else if (filter !== null) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
 }
 
 export function disposeGlaucoma(camera: Phaser.Cameras.Scene2D.Camera): void {
-  if (filter !== null) {
+  const filter = filters.get(camera);
+  if (filter !== undefined) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
 }

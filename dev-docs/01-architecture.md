@@ -164,7 +164,7 @@ The bottom view has four modes, controlled by `viewSettings.mode`:
 | `right` | Right eye's config only. The image fills the canvas.                                                                                                     |
 | `split` | The canvas is split vertically. Left half = left eye, right half = right eye. Each half is a separately rendered sub-region with its own pipeline stack. |
 
-`split` is the trickiest. Implementation: render the same scene twice into two render-textures (left config, right config), then composite them into the final frame with a tiny shader or two side-by-side Phaser cameras. Defer detailed design to phase 4 of the roadmap.
+`split` was implemented in roadmap step 7.2 with the two-cameras approach (cleaner than render-textures-into-shader). VisionScene owns the two extra cameras alongside the main one; `setSplitMode(enabled)` toggles which set is active by setting viewports (main → 0×0 when split, the two side cameras get half each, scrolled so the sprite is centred in each viewport). `pipelineManager.syncFromStore` branches on `viewMode === 'split'` and runs each filter pipeline twice — once with the left split camera + L-only params, once with the right + R-only params. To support that, every filter pipeline keeps its filters in a `WeakMap<Camera, Filter>` so the same module can drive separate filters on each camera. The split divider + L/R labels are a DOM overlay in `ImpairedView.vue`, not a Phaser game object, so they never pass through any filter. Sprite-based pipelines (Floaters, Migraine aura) are scene-wide game objects; in split mode their per-eye params still blend rather than render per side — a v1.1 cleanup if it matters.
 
 ## Custom mask architecture
 

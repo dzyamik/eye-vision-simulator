@@ -25,6 +25,13 @@ export class VisionScene extends Phaser.Scene {
   private isReady = false;
   private nextKeyId = 0;
 
+  /** Extra cameras for the split view. Each occupies one half of the canvas
+   *  and renders the same scene (the image sprite) with its own filter list.
+   *  Created in create(); idle (zero viewport) until setSplitMode(true). */
+  leftSplitCamera: Phaser.Cameras.Scene2D.Camera | null = null;
+  rightSplitCamera: Phaser.Cameras.Scene2D.Camera | null = null;
+  private splitActive = false;
+
   constructor() {
     super({ key: VisionScene.KEY });
     this.ready = new Promise<void>((resolve) => {
@@ -34,16 +41,50 @@ export class VisionScene extends Phaser.Scene {
 
   create(): void {
     this.isReady = true;
-    this.scale.on('resize', this.fitSprite, this);
+    this.scale.on('resize', this.onResize, this);
     this.ensureCataractNoise();
     this.ensureFloaterTexture();
     this.ensureMigraineAuraTexture();
+    // Add split cameras alongside main. Initially idle (0×0 viewport).
+    this.leftSplitCamera = this.cameras.add(0, 0, 0, 0);
+    this.rightSplitCamera = this.cameras.add(0, 0, 0, 0);
     if (this.pendingSrc !== null) {
       const src = this.pendingSrc;
       this.pendingSrc = null;
       this.setImage(src);
     }
     this.resolveReady();
+  }
+
+  /** Toggle between single-camera and split-camera rendering. In split mode
+   *  main is hidden (viewport collapsed), split cameras take half each, and
+   *  the sprite is refit to half-width so each side shows the full image.
+   *  pipelineManager calls this whenever viewMode changes. */
+  setSplitMode(enabled: boolean): void {
+    if (this.leftSplitCamera === null || this.rightSplitCamera === null) return;
+    this.splitActive = enabled;
+    const main = this.cameras.main;
+    if (enabled) {
+      const halfW = main.width / 2;
+      this.leftSplitCamera.setViewport(0, 0, halfW, main.height);
+      this.rightSplitCamera.setViewport(halfW, 0, halfW, main.height);
+      // Both split cameras look at the same world point (the sprite's
+      // centre); each viewport just clips to its own half of the screen.
+      this.leftSplitCamera.setScroll(main.width / 2 - halfW / 2, 0);
+      this.rightSplitCamera.setScroll(main.width / 2 - halfW / 2, 0);
+      main.setVisible(false);
+    } else {
+      this.leftSplitCamera.setViewport(0, 0, 0, 0);
+      this.rightSplitCamera.setViewport(0, 0, 0, 0);
+      main.setVisible(true);
+    }
+    this.fitSprite();
+  }
+
+  private onResize(): void {
+    this.fitSprite();
+    // Re-apply split viewports + scrolls with the new camera dimensions.
+    if (this.splitActive) this.setSplitMode(true);
   }
 
   /** Lazily seeds a 128×128 grayscale-noise texture under 'cataract-noise',
@@ -192,7 +233,11 @@ export class VisionScene extends Phaser.Scene {
     const sw = source.width;
     const sh = source.height;
     if (sw === 0 || sh === 0) return;
-    const scale = Math.min(cam.width / sw, cam.height / sh);
+    // In split mode each viewport is half the canvas width, so we fit to
+    // half-width to show the whole image on each side. In single-camera
+    // modes we fit to full width.
+    const fitWidth = this.splitActive ? cam.width / 2 : cam.width;
+    const scale = Math.min(fitWidth / sw, cam.height / sh);
     this.sprite.setScale(scale);
     this.sprite.setPosition(cam.width / 2, cam.height / 2);
   }

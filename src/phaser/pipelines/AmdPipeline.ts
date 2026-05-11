@@ -39,8 +39,23 @@ interface AmdParams {
   rightDistortion: number;
 }
 
-let scotomaFilter: Phaser.Filters.Blend | null = null;
-let displacementFilter: Phaser.Filters.Displacement | null = null;
+interface AmdFilters {
+  scotoma: Phaser.Filters.Blend | null;
+  displacement: Phaser.Filters.Displacement | null;
+}
+const filters = new WeakMap<Phaser.Cameras.Scene2D.Camera, AmdFilters>();
+
+function getOrInit(camera: Phaser.Cameras.Scene2D.Camera): AmdFilters {
+  let entry = filters.get(camera);
+  if (entry === undefined) {
+    entry = { scotoma: null, displacement: null };
+    filters.set(camera, entry);
+  }
+  return entry;
+}
+
+// Texture cache is global — one canvas shared by every camera that needs
+// it (each camera's Blend filter references the same texture key).
 let lastScotomaRadius = -1;
 let lastFalloff = -1;
 
@@ -103,6 +118,8 @@ export function syncAmd(
   const wantsScotoma = anyActive && scotomaRadius > ACTIVE_THRESHOLD;
   const wantsDistortion = anyActive && distortion > ACTIVE_THRESHOLD;
 
+  const entry = getOrInit(camera);
+
   // --- scotoma (blend filter) ---
   if (wantsScotoma) {
     const tex = ensureScotomaTexture(scene);
@@ -111,45 +128,40 @@ export function syncAmd(
       lastScotomaRadius = scotomaRadius;
       lastFalloff = falloff;
     }
-    if (scotomaFilter === null) {
-      scotomaFilter = camera.filters.internal.addBlend(
+    if (entry.scotoma === null) {
+      entry.scotoma = camera.filters.internal.addBlend(
         SCOTOMA_TEXTURE_KEY,
         Phaser.BlendModes.NORMAL,
         1,
         [0, 0, 0, 1],
       );
     }
-  } else if (scotomaFilter !== null) {
-    camera.filters.internal.remove(scotomaFilter);
-    scotomaFilter = null;
+  } else if (entry.scotoma !== null) {
+    camera.filters.internal.remove(entry.scotoma);
+    entry.scotoma = null;
   }
 
   // --- distortion (displacement filter) ---
   if (wantsDistortion) {
-    if (displacementFilter === null) {
-      displacementFilter = camera.filters.internal.addDisplacement(
+    if (entry.displacement === null) {
+      entry.displacement = camera.filters.internal.addDisplacement(
         'cataract-noise',
         distortion * MAX_DISPLACEMENT,
         distortion * MAX_DISPLACEMENT,
       );
     }
-    displacementFilter.x = distortion * MAX_DISPLACEMENT;
-    displacementFilter.y = distortion * MAX_DISPLACEMENT;
-  } else if (displacementFilter !== null) {
-    camera.filters.internal.remove(displacementFilter);
-    displacementFilter = null;
+    entry.displacement.x = distortion * MAX_DISPLACEMENT;
+    entry.displacement.y = distortion * MAX_DISPLACEMENT;
+  } else if (entry.displacement !== null) {
+    camera.filters.internal.remove(entry.displacement);
+    entry.displacement = null;
   }
 }
 
 export function disposeAmd(camera: Phaser.Cameras.Scene2D.Camera): void {
-  if (scotomaFilter !== null) {
-    camera.filters.internal.remove(scotomaFilter);
-    scotomaFilter = null;
-  }
-  if (displacementFilter !== null) {
-    camera.filters.internal.remove(displacementFilter);
-    displacementFilter = null;
-  }
-  lastScotomaRadius = -1;
-  lastFalloff = -1;
+  const entry = filters.get(camera);
+  if (entry === undefined) return;
+  if (entry.scotoma !== null) camera.filters.internal.remove(entry.scotoma);
+  if (entry.displacement !== null) camera.filters.internal.remove(entry.displacement);
+  filters.delete(camera);
 }

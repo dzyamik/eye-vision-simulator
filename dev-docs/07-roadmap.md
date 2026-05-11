@@ -297,15 +297,15 @@ Goal: the bottom view supports Both / Left / Right / Split.
 
 ### 7.1 Single-camera modes (Both / Left / Right)
 
-- [ ] `pipelineManager.syncFromStore` reads `viewMode` and computes which eye's settings (or blend) to apply.
-- [ ] "Both" mode averages the active uniforms from left+right. (Strict averaging is wrong physiologically, but a reasonable proxy for v1. Document this.)
+- [x] `pipelineManager.syncFromStore` reads `viewMode` and computes which eye's settings (or blend) to apply.
+- [x] "Both" mode averages the active uniforms from left+right. (Strict averaging is wrong physiologically, but a reasonable proxy for v1. Document this.)
 
 **Acceptance:** Switching between Left/Right/Both visibly changes the output to match each eye's individual settings.
 
 ### 7.2 Split view
 
-- [ ] Two cameras side by side, each with its own pipeline stack.
-- [ ] A thin labeled divider drawn at the midline.
+- [x] Two cameras side by side, each with its own pipeline stack.
+- [x] A thin labeled divider drawn at the midline.
 
 **Acceptance:** With different settings per eye, the canvas shows them side-by-side.
 

@@ -29,12 +29,12 @@ interface AstigParams {
   rightAxis: number;
 }
 
-let filter: Phaser.Filters.Blur | null = null;
+const filters = new WeakMap<Phaser.Cameras.Scene2D.Camera, Phaser.Filters.Blur>();
 
 function pickAxis(p: AstigParams): number {
   // When both eyes are enabled, use the higher-magnitude side's axis. With
   // matching magnitudes left wins (arbitrary but stable). When only one
-  // side is enabled, use that side's axis. Phase 7 will pick per viewMode.
+  // side is enabled, use that side's axis.
   if (p.leftActive && p.rightActive) {
     return p.leftMagnitude >= p.rightMagnitude ? p.leftAxis : p.rightAxis;
   }
@@ -46,27 +46,28 @@ export function syncAstigmatism(
   params: AstigParams,
 ): void {
   const anyActive = params.leftActive || params.rightActive;
-  // Average magnitudes for Phase 6's blend-both-eyes view; Phase 7 splits.
   const blendedMagnitude = (params.leftMagnitude + params.rightMagnitude) / 2;
+  let filter = filters.get(camera) ?? null;
 
   if (anyActive && blendedMagnitude > ACTIVE_THRESHOLD) {
     if (filter === null) {
       filter = camera.filters.internal.addBlur(0, 0, 0, 1, 0xffffff, 4);
+      filters.set(camera, filter);
     }
     const axisRad = (pickAxis(params) * Math.PI) / 180;
     const scale = blendedMagnitude * MAX_ASTIG_OFFSET;
-    // x/y are absolute pixel offsets per step; never negative.
     filter.x = Math.abs(Math.sin(axisRad)) * scale;
     filter.y = Math.abs(Math.cos(axisRad)) * scale;
   } else if (filter !== null) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
 }
 
 export function disposeAstigmatism(camera: Phaser.Cameras.Scene2D.Camera): void {
-  if (filter !== null) {
+  const filter = filters.get(camera);
+  if (filter !== undefined) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
 }

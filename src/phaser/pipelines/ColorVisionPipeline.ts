@@ -29,7 +29,7 @@ interface ColorVisionParams {
   rightSeverity: number;
 }
 
-let filter: Phaser.Filters.ColorMatrix | null = null;
+const filters = new WeakMap<Phaser.Cameras.Scene2D.Camera, Phaser.Filters.ColorMatrix>();
 
 function pad(m: ColorMatrix): number[] {
   // 3×3 row-major → 4×5 row-major. The 4th column is RGBA scaling for the
@@ -73,22 +73,25 @@ export function syncColorVision(
 ): void {
   const { type, severity } = pickEffective(params);
   const effective = type !== 'normal' && severity > ACTIVE_THRESHOLD;
+  let filter = filters.get(camera) ?? null;
 
   if (effective) {
     if (filter === null) {
       filter = camera.filters.internal.addColorMatrix();
+      filters.set(camera, filter);
     }
     filter.colorMatrix.set(pad(COLOR_MATRICES[type]));
     filter.colorMatrix.alpha = severity;
   } else if (filter !== null) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
 }
 
 export function disposeColorVision(camera: Phaser.Cameras.Scene2D.Camera): void {
-  if (filter !== null) {
+  const filter = filters.get(camera);
+  if (filter !== undefined) {
     camera.filters.internal.remove(filter);
-    filter = null;
+    filters.delete(camera);
   }
 }

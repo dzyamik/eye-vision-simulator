@@ -29,8 +29,20 @@ const MAX_BRIGHTNESS_LOSS = 0.7;
 // Warm-grey tint applied to the noise texture for the cloud overlay.
 const WARM_GREY: readonly [number, number, number, number] = [0.78, 0.78, 0.74, 1];
 
-let matrix: Phaser.Filters.ColorMatrix | null = null;
-let blend: Phaser.Filters.Blend | null = null;
+interface CataractFilters {
+  matrix: Phaser.Filters.ColorMatrix | null;
+  blend: Phaser.Filters.Blend | null;
+}
+const filters = new WeakMap<Phaser.Cameras.Scene2D.Camera, CataractFilters>();
+
+function getOrInit(camera: Phaser.Cameras.Scene2D.Camera): CataractFilters {
+  let entry = filters.get(camera);
+  if (entry === undefined) {
+    entry = { matrix: null, blend: null };
+    filters.set(camera, entry);
+  }
+  return entry;
+}
 
 interface CataractParams {
   leftActive: boolean;
@@ -78,46 +90,45 @@ export function syncCataract(
       cloudiness > ACTIVE_THRESHOLD ||
       brightnessLoss > ACTIVE_THRESHOLD);
 
+  const entry = getOrInit(camera);
+
   if (effective) {
-    if (matrix === null) {
-      matrix = camera.filters.internal.addColorMatrix();
+    if (entry.matrix === null) {
+      entry.matrix = camera.filters.internal.addColorMatrix();
     }
-    matrix.colorMatrix.set(buildMatrix(yellowing, brightnessLoss));
-    matrix.colorMatrix.alpha = 1;
+    entry.matrix.colorMatrix.set(buildMatrix(yellowing, brightnessLoss));
+    entry.matrix.colorMatrix.alpha = 1;
 
     if (cloudiness > ACTIVE_THRESHOLD) {
-      if (blend === null) {
-        blend = camera.filters.internal.addBlend(
+      if (entry.blend === null) {
+        entry.blend = camera.filters.internal.addBlend(
           'cataract-noise',
           Phaser.BlendModes.NORMAL,
           cloudiness * MAX_CLOUDINESS,
           [...WARM_GREY],
         );
       }
-      blend.amount = cloudiness * MAX_CLOUDINESS;
-    } else if (blend !== null) {
-      camera.filters.internal.remove(blend);
-      blend = null;
+      entry.blend.amount = cloudiness * MAX_CLOUDINESS;
+    } else if (entry.blend !== null) {
+      camera.filters.internal.remove(entry.blend);
+      entry.blend = null;
     }
   } else {
-    if (matrix !== null) {
-      camera.filters.internal.remove(matrix);
-      matrix = null;
+    if (entry.matrix !== null) {
+      camera.filters.internal.remove(entry.matrix);
+      entry.matrix = null;
     }
-    if (blend !== null) {
-      camera.filters.internal.remove(blend);
-      blend = null;
+    if (entry.blend !== null) {
+      camera.filters.internal.remove(entry.blend);
+      entry.blend = null;
     }
   }
 }
 
 export function disposeCataract(camera: Phaser.Cameras.Scene2D.Camera): void {
-  if (matrix !== null) {
-    camera.filters.internal.remove(matrix);
-    matrix = null;
-  }
-  if (blend !== null) {
-    camera.filters.internal.remove(blend);
-    blend = null;
-  }
+  const entry = filters.get(camera);
+  if (entry === undefined) return;
+  if (entry.matrix !== null) camera.filters.internal.remove(entry.matrix);
+  if (entry.blend !== null) camera.filters.internal.remove(entry.blend);
+  filters.delete(camera);
 }

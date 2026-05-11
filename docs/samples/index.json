@@ -1,0 +1,34 @@
+[
+  {
+    "filename": "nordic-house.jpg",
+    "name": "House front (Nordic)",
+    "width": 1280,
+    "height": 969,
+    "credit": "Boereck (public domain)",
+    "source": "https://commons.wikimedia.org/wiki/File:Nordisches_Einfamilienhaus.jpg"
+  },
+  {
+    "filename": "pompei-sidewalk.jpg",
+    "name": "Sidewalk in Pompei",
+    "width": 1280,
+    "height": 960,
+    "credit": "Tanya Dedyukhina, CC BY 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Pompei_-_panoramio_(26).jpg"
+  },
+  {
+    "filename": "prairie-clouds.jpg",
+    "name": "Prairie under cumulus clouds",
+    "width": 1280,
+    "height": 850,
+    "credit": "Wing-Chi Poon, CC BY-SA 2.5",
+    "source": "https://commons.wikimedia.org/wiki/File:Cumulus_Clouds_over_Yellow_Prairie2.jpg"
+  },
+  {
+    "filename": "crosswalk.jpg",
+    "name": "Pedestrians on a crosswalk",
+    "width": 1280,
+    "height": 853,
+    "credit": "Alex Proimos, CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:CrossWalk_(5465840138).jpg"
+  }
+]

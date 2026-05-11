@@ -21,7 +21,11 @@ import type Phaser from 'phaser';
 import { watch } from 'vue';
 
 import { useEyeSettingsStore } from '@/stores/eyeSettings';
+import type { ViewMode } from '@/stores/viewSettings';
+import { useViewSettingsStore } from '@/stores/viewSettings';
 import type { ConditionKey, EyeSettings } from '@/types/eyeSettings';
+
+import type { VisionScene } from './VisionScene';
 
 import { disposeAmd, syncAmd } from './pipelines/AmdPipeline';
 import { disposeAstigmatism, syncAstigmatism } from './pipelines/AstigmatismPipeline';
@@ -76,6 +80,24 @@ function clamp01(n: number): number {
   return n;
 }
 
+/** Resolves which side's value to feed into each of the pipeline's L/R
+ *  inputs given the active viewMode. The pipelines themselves blend their
+ *  L/R inputs (averaging for numerics, winner-takes-all for enums), so:
+ *
+ *    - 'left'    → return [L, L]   pipeline sees only L's value
+ *    - 'right'   → return [R, R]   pipeline sees only R's value
+ *    - 'both'    → return [L, R]   pipeline averages naturally
+ *    - 'split'   → return [L, R]   per-eye rendering is 7.2's job; for
+ *                                  7.1 we treat split the same as both.
+ *
+ *  This means a viewMode change only edits the manager's plumbing — none
+ *  of the per-condition pipelines need to know viewMode exists. */
+function pickPair<T>(viewMode: ViewMode, l: T, r: T): readonly [T, T] {
+  if (viewMode === 'left') return [l, l];
+  if (viewMode === 'right') return [r, r];
+  return [l, r];
+}
+
 interface BlurSide {
   myopia: { enabled: boolean; strength: number };
   hyperopia: { enabled: boolean; strength: number };
@@ -100,137 +122,272 @@ function combinedBlur(side: BlurSide): { active: boolean; strength: number } {
   return { active, strength: clamp01(strength) };
 }
 
-function syncBlurFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null) return;
+function syncBlurFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
   const l = combinedBlur(eye.left as BlurSide);
   const r = combinedBlur(eye.right as BlurSide);
-  syncBlur(camera, {
-    leftActive: l.active,
-    leftStrength: l.strength,
-    rightActive: r.active,
-    rightStrength: r.strength,
+  const [actL, actR] = pickPair(viewMode, l.active, r.active);
+  const [sL, sR] = pickPair(viewMode, l.strength, r.strength);
+  syncBlur(cam, {
+    leftActive: actL,
+    leftStrength: sL,
+    rightActive: actR,
+    rightStrength: sR,
   });
 }
 
-function syncAstigmatismFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null) return;
-  syncAstigmatism(camera, {
-    leftActive: eye.left.astigmatism.enabled,
-    leftMagnitude: eye.left.astigmatism.magnitude,
-    leftAxis: eye.left.astigmatism.axis,
-    rightActive: eye.right.astigmatism.enabled,
-    rightMagnitude: eye.right.astigmatism.magnitude,
-    rightAxis: eye.right.astigmatism.axis,
+function syncAstigmatismFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  const [actL, actR] = pickPair(viewMode, eye.left.astigmatism.enabled, eye.right.astigmatism.enabled);
+  const [mL, mR] = pickPair(viewMode, eye.left.astigmatism.magnitude, eye.right.astigmatism.magnitude);
+  const [axL, axR] = pickPair(viewMode, eye.left.astigmatism.axis, eye.right.astigmatism.axis);
+  syncAstigmatism(cam, {
+    leftActive: actL,
+    leftMagnitude: mL,
+    leftAxis: axL,
+    rightActive: actR,
+    rightMagnitude: mR,
+    rightAxis: axR,
   });
 }
 
-function syncColorVisionFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null) return;
-  syncColorVision(camera, {
-    leftActive: eye.left.colorVision.enabled,
-    leftType: eye.left.colorVision.type,
-    leftSeverity: eye.left.colorVision.severity,
-    rightActive: eye.right.colorVision.enabled,
-    rightType: eye.right.colorVision.type,
-    rightSeverity: eye.right.colorVision.severity,
+function syncColorVisionFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  const [actL, actR] = pickPair(viewMode, eye.left.colorVision.enabled, eye.right.colorVision.enabled);
+  const [tL, tR] = pickPair(viewMode, eye.left.colorVision.type, eye.right.colorVision.type);
+  const [sevL, sevR] = pickPair(viewMode, eye.left.colorVision.severity, eye.right.colorVision.severity);
+  syncColorVision(cam, {
+    leftActive: actL,
+    leftType: tL,
+    leftSeverity: sevL,
+    rightActive: actR,
+    rightType: tR,
+    rightSeverity: sevR,
   });
 }
 
-function syncCataractFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null) return;
-  syncCataract(camera, {
-    leftActive: eye.left.cataract.enabled,
-    leftCloudiness: eye.left.cataract.cloudiness,
-    leftYellowing: eye.left.cataract.yellowing,
-    leftBrightnessLoss: eye.left.cataract.brightnessLoss,
-    rightActive: eye.right.cataract.enabled,
-    rightCloudiness: eye.right.cataract.cloudiness,
-    rightYellowing: eye.right.cataract.yellowing,
-    rightBrightnessLoss: eye.right.cataract.brightnessLoss,
+function syncCataractFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  const [actL, actR] = pickPair(viewMode, eye.left.cataract.enabled, eye.right.cataract.enabled);
+  const [clL, clR] = pickPair(viewMode, eye.left.cataract.cloudiness, eye.right.cataract.cloudiness);
+  const [yL, yR] = pickPair(viewMode, eye.left.cataract.yellowing, eye.right.cataract.yellowing);
+  const [bL, bR] = pickPair(viewMode, eye.left.cataract.brightnessLoss, eye.right.cataract.brightnessLoss);
+  syncCataract(cam, {
+    leftActive: actL,
+    leftCloudiness: clL,
+    leftYellowing: yL,
+    leftBrightnessLoss: bL,
+    rightActive: actR,
+    rightCloudiness: clR,
+    rightYellowing: yR,
+    rightBrightnessLoss: bR,
   });
 }
 
-function syncGlaucomaFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null) return;
-  syncGlaucoma(camera, {
-    leftActive: eye.left.glaucoma.enabled,
-    leftInnerRadius: eye.left.glaucoma.innerRadius,
-    leftSeverity: eye.left.glaucoma.severity,
-    rightActive: eye.right.glaucoma.enabled,
-    rightInnerRadius: eye.right.glaucoma.innerRadius,
-    rightSeverity: eye.right.glaucoma.severity,
+function syncGlaucomaFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  const [actL, actR] = pickPair(viewMode, eye.left.glaucoma.enabled, eye.right.glaucoma.enabled);
+  const [rL, rR] = pickPair(viewMode, eye.left.glaucoma.innerRadius, eye.right.glaucoma.innerRadius);
+  const [sevL, sevR] = pickPair(viewMode, eye.left.glaucoma.severity, eye.right.glaucoma.severity);
+  syncGlaucoma(cam, {
+    leftActive: actL,
+    leftInnerRadius: rL,
+    leftSeverity: sevL,
+    rightActive: actR,
+    rightInnerRadius: rR,
+    rightSeverity: sevR,
   });
 }
 
-function syncRetinitisPigmentosaFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null) return;
-  syncRetinitisPigmentosa(camera, {
-    leftActive: eye.left.retinitisPigmentosa.enabled,
-    leftTunnelRadius: eye.left.retinitisPigmentosa.tunnelRadius,
-    leftBrightnessLoss: eye.left.retinitisPigmentosa.brightnessLoss,
-    rightActive: eye.right.retinitisPigmentosa.enabled,
-    rightTunnelRadius: eye.right.retinitisPigmentosa.tunnelRadius,
-    rightBrightnessLoss: eye.right.retinitisPigmentosa.brightnessLoss,
+function syncRetinitisPigmentosaFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  const [actL, actR] = pickPair(
+    viewMode,
+    eye.left.retinitisPigmentosa.enabled,
+    eye.right.retinitisPigmentosa.enabled,
+  );
+  const [tL, tR] = pickPair(
+    viewMode,
+    eye.left.retinitisPigmentosa.tunnelRadius,
+    eye.right.retinitisPigmentosa.tunnelRadius,
+  );
+  const [bL, bR] = pickPair(
+    viewMode,
+    eye.left.retinitisPigmentosa.brightnessLoss,
+    eye.right.retinitisPigmentosa.brightnessLoss,
+  );
+  syncRetinitisPigmentosa(cam, {
+    leftActive: actL,
+    leftTunnelRadius: tL,
+    leftBrightnessLoss: bL,
+    rightActive: actR,
+    rightTunnelRadius: tR,
+    rightBrightnessLoss: bR,
   });
 }
 
-function syncAmdFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null || scene === null) return;
-  syncAmd(scene, camera, {
-    leftActive: eye.left.amd.enabled,
-    leftScotomaRadius: eye.left.amd.scotomaRadius,
-    leftFalloff: eye.left.amd.falloff,
-    leftDistortion: eye.left.amd.distortion,
-    rightActive: eye.right.amd.enabled,
-    rightScotomaRadius: eye.right.amd.scotomaRadius,
-    rightFalloff: eye.right.amd.falloff,
-    rightDistortion: eye.right.amd.distortion,
-  });
-}
-
-function syncDrFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
-  if (camera === null || scene === null) return;
-  syncDiabeticRetinopathy(scene, camera, {
-    leftActive: eye.left.diabeticRetinopathy.enabled,
-    leftSpotCount: eye.left.diabeticRetinopathy.spotCount,
-    leftSpotSize: eye.left.diabeticRetinopathy.spotSize,
-    leftSeverity: eye.left.diabeticRetinopathy.severity,
-    rightActive: eye.right.diabeticRetinopathy.enabled,
-    rightSpotCount: eye.right.diabeticRetinopathy.spotCount,
-    rightSpotSize: eye.right.diabeticRetinopathy.spotSize,
-    rightSeverity: eye.right.diabeticRetinopathy.severity,
-  });
-}
-
-function syncFloatersFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+function syncAmdFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
   if (scene === null) return;
+  const [actL, actR] = pickPair(viewMode, eye.left.amd.enabled, eye.right.amd.enabled);
+  const [sL, sR] = pickPair(viewMode, eye.left.amd.scotomaRadius, eye.right.amd.scotomaRadius);
+  const [fL, fR] = pickPair(viewMode, eye.left.amd.falloff, eye.right.amd.falloff);
+  const [dL, dR] = pickPair(viewMode, eye.left.amd.distortion, eye.right.amd.distortion);
+  syncAmd(scene, cam, {
+    leftActive: actL,
+    leftScotomaRadius: sL,
+    leftFalloff: fL,
+    leftDistortion: dL,
+    rightActive: actR,
+    rightScotomaRadius: sR,
+    rightFalloff: fR,
+    rightDistortion: dR,
+  });
+}
+
+function syncDrFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  if (scene === null) return;
+  const [actL, actR] = pickPair(
+    viewMode,
+    eye.left.diabeticRetinopathy.enabled,
+    eye.right.diabeticRetinopathy.enabled,
+  );
+  const [cL, cR] = pickPair(
+    viewMode,
+    eye.left.diabeticRetinopathy.spotCount,
+    eye.right.diabeticRetinopathy.spotCount,
+  );
+  const [zL, zR] = pickPair(
+    viewMode,
+    eye.left.diabeticRetinopathy.spotSize,
+    eye.right.diabeticRetinopathy.spotSize,
+  );
+  const [sevL, sevR] = pickPair(
+    viewMode,
+    eye.left.diabeticRetinopathy.severity,
+    eye.right.diabeticRetinopathy.severity,
+  );
+  syncDiabeticRetinopathy(scene, cam, {
+    leftActive: actL,
+    leftSpotCount: cL,
+    leftSpotSize: zL,
+    leftSeverity: sevL,
+    rightActive: actR,
+    rightSpotCount: cR,
+    rightSpotSize: zR,
+    rightSeverity: sevR,
+  });
+}
+
+/** Runs every camera-filter sync against one camera with a single viewMode.
+ *  Called once with main camera in single-camera modes; called twice in
+ *  split mode (once per side camera, with viewMode='left'/'right'). */
+function syncFilterPipelinesForCamera(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+  cam: Phaser.Cameras.Scene2D.Camera,
+): void {
+  syncColorVisionFromStore(eye, viewMode, cam);
+  syncCataractFromStore(eye, viewMode, cam);
+  syncBlurFromStore(eye, viewMode, cam);
+  syncAstigmatismFromStore(eye, viewMode, cam);
+  syncAmdFromStore(eye, viewMode, cam);
+  syncGlaucomaFromStore(eye, viewMode, cam);
+  syncRetinitisPigmentosaFromStore(eye, viewMode, cam);
+  syncDrFromStore(eye, viewMode, cam);
+}
+
+/** Removes every filter from one camera. Used when switching modes so we
+ *  don't carry orphan filters from the previously-active camera set. */
+function disposeAllFiltersOn(cam: Phaser.Cameras.Scene2D.Camera): void {
+  disposeColorVision(cam);
+  disposeCataract(cam);
+  disposeBlur(cam);
+  disposeAstigmatism(cam);
+  disposeAmd(cam);
+  disposeGlaucoma(cam);
+  disposeRetinitisPigmentosa(cam);
+  disposeDiabeticRetinopathy(cam);
+}
+
+function syncFloatersFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+): void {
+  if (scene === null) return;
+  const [actL, actR] = pickPair(viewMode, eye.left.floaters.enabled, eye.right.floaters.enabled);
+  const [cL, cR] = pickPair(viewMode, eye.left.floaters.count, eye.right.floaters.count);
+  const [zL, zR] = pickPair(viewMode, eye.left.floaters.size, eye.right.floaters.size);
+  const [oL, oR] = pickPair(viewMode, eye.left.floaters.opacity, eye.right.floaters.opacity);
+  const [anL, anR] = pickPair(viewMode, eye.left.floaters.animate, eye.right.floaters.animate);
   syncFloaters(scene, {
-    leftActive: eye.left.floaters.enabled,
-    leftCount: eye.left.floaters.count,
-    leftSize: eye.left.floaters.size,
-    leftOpacity: eye.left.floaters.opacity,
-    leftAnimate: eye.left.floaters.animate,
-    rightActive: eye.right.floaters.enabled,
-    rightCount: eye.right.floaters.count,
-    rightSize: eye.right.floaters.size,
-    rightOpacity: eye.right.floaters.opacity,
-    rightAnimate: eye.right.floaters.animate,
+    leftActive: actL,
+    leftCount: cL,
+    leftSize: zL,
+    leftOpacity: oL,
+    leftAnimate: anL,
+    rightActive: actR,
+    rightCount: cR,
+    rightSize: zR,
+    rightOpacity: oR,
+    rightAnimate: anR,
   });
 }
 
-function syncMigraineAuraFromStore(eye: ReturnType<typeof useEyeSettingsStore>): void {
+function syncMigraineAuraFromStore(
+  eye: ReturnType<typeof useEyeSettingsStore>,
+  viewMode: ViewMode,
+): void {
   if (scene === null) return;
+  const [actL, actR] = pickPair(viewMode, eye.left.migraineAura.enabled, eye.right.migraineAura.enabled);
+  const [rL, rR] = pickPair(viewMode, eye.left.migraineAura.radius, eye.right.migraineAura.radius);
+  const [xL, xR] = pickPair(
+    viewMode,
+    eye.left.migraineAura.positionX,
+    eye.right.migraineAura.positionX,
+  );
+  const [yL, yR] = pickPair(
+    viewMode,
+    eye.left.migraineAura.positionY,
+    eye.right.migraineAura.positionY,
+  );
+  const [anL, anR] = pickPair(viewMode, eye.left.migraineAura.animate, eye.right.migraineAura.animate);
   syncMigraineAura(scene, {
-    leftActive: eye.left.migraineAura.enabled,
-    leftRadius: eye.left.migraineAura.radius,
-    leftPositionX: eye.left.migraineAura.positionX,
-    leftPositionY: eye.left.migraineAura.positionY,
-    leftAnimate: eye.left.migraineAura.animate,
-    rightActive: eye.right.migraineAura.enabled,
-    rightRadius: eye.right.migraineAura.radius,
-    rightPositionX: eye.right.migraineAura.positionX,
-    rightPositionY: eye.right.migraineAura.positionY,
-    rightAnimate: eye.right.migraineAura.animate,
+    leftActive: actL,
+    leftRadius: rL,
+    leftPositionX: xL,
+    leftPositionY: yL,
+    leftAnimate: anL,
+    rightActive: actR,
+    rightRadius: rR,
+    rightPositionX: xR,
+    rightPositionY: yR,
+    rightAnimate: anR,
   });
 }
 
@@ -239,22 +396,19 @@ export const pipelineManager: PipelineManager = {
     if (camera !== null && stopWatch !== null) {
       // Re-init: tear down the old watcher + filters so we don't double-up.
       stopWatch();
-      disposeBlur(camera);
-      disposeAstigmatism(camera);
-      disposeColorVision(camera);
-      disposeCataract(camera);
-      disposeGlaucoma(camera);
-      disposeRetinitisPigmentosa(camera);
-      disposeAmd(camera);
-      disposeDiabeticRetinopathy(camera);
+      disposeAllFiltersOn(camera);
+      const visionScene = scene as VisionScene | null;
+      if (visionScene?.leftSplitCamera) disposeAllFiltersOn(visionScene.leftSplitCamera);
+      if (visionScene?.rightSplitCamera) disposeAllFiltersOn(visionScene.rightSplitCamera);
       disposeFloaters();
       disposeMigraineAura();
     }
     scene = sceneArg;
     camera = sceneArg.cameras.main;
     const eye = useEyeSettingsStore();
+    const view = useViewSettingsStore();
     stopWatch = watch(
-      () => [eye.left, eye.right] as [EyeSettings, EyeSettings],
+      () => [eye.left, eye.right, view.viewMode] as [EyeSettings, EyeSettings, ViewMode],
       () => pipelineManager.syncFromStore(),
       { deep: true, flush: 'post' },
     );
@@ -277,23 +431,36 @@ export const pipelineManager: PipelineManager = {
   },
 
   syncFromStore(): void {
-    if (camera === null) return;
+    if (camera === null || scene === null) return;
     const eye = useEyeSettingsStore();
-    // STACKING_ORDER says colorVision runs first; we call it first here, but
-    // Phaser actually runs filters in the order they were attached, which
-    // depends on activation timing. A future cleanup will sort camera.filters
-    // by STACKING_ORDER. For now color-then-blur visually approximates the
-    // intended pipeline.
-    syncColorVisionFromStore(eye);
-    syncCataractFromStore(eye);
-    syncBlurFromStore(eye);
-    syncAstigmatismFromStore(eye);
-    syncAmdFromStore(eye);
-    syncGlaucomaFromStore(eye);
-    syncRetinitisPigmentosaFromStore(eye);
-    syncDrFromStore(eye);
-    syncFloatersFromStore(eye);
-    syncMigraineAuraFromStore(eye);
+    const view = useViewSettingsStore();
+    const viewMode = view.viewMode;
+    const visionScene = scene as VisionScene;
+    const leftSplit = visionScene.leftSplitCamera;
+    const rightSplit = visionScene.rightSplitCamera;
+
+    if (viewMode === 'split' && leftSplit !== null && rightSplit !== null) {
+      // Move filters from the main camera to the two halves. Each split
+      // camera gets its own filter stack derived from its eye's params.
+      disposeAllFiltersOn(camera);
+      visionScene.setSplitMode(true);
+      syncFilterPipelinesForCamera(eye, 'left', leftSplit);
+      syncFilterPipelinesForCamera(eye, 'right', rightSplit);
+    } else {
+      // Single-camera modes (both / left / right). Make sure no leftover
+      // split-camera filters are still attached, then sync main.
+      if (leftSplit !== null) disposeAllFiltersOn(leftSplit);
+      if (rightSplit !== null) disposeAllFiltersOn(rightSplit);
+      visionScene.setSplitMode(false);
+      syncFilterPipelinesForCamera(eye, viewMode, camera);
+    }
+
+    // Sprite-based pipelines (Floaters, Migraine aura) are scene-wide
+    // game objects, not camera filters. They render through every visible
+    // camera, so we sync them once with viewMode-aware blending regardless
+    // of which camera set is currently active.
+    syncFloatersFromStore(eye, viewMode);
+    syncMigraineAuraFromStore(eye, viewMode);
     // Custom mask wires up in Phase 8.x.
   },
 };
