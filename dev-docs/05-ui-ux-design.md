@@ -70,22 +70,30 @@
 
 A light theme can be added in v1.1 by adding a `[data-theme="light"]` block. v1 ships dark only.
 
-## Eye selector
+## Sidebar layout (per-eye rows)
 
-A segmented toggle at the top of the sidebar:
+> **UX note (2026-05-11):** the original spec used a `Left | Right | Both`
+> tab at the top of the sidebar (one shared set of controls; "Both" linked
+> writes). User feedback during step 5.2 changed this to a per-eye-rows
+> layout: every condition shows L and R as separate rows, with a global
+> "Sync both eyes" toggle at the top of the sidebar that mirrors writes
+> across L ↔ R. The text below describes the new layout. The old tab
+> approach is preserved in git history (commits up to `a908fbb` if you
+> want the prior shape).
+
+A single checkbox at the very top of the sidebar:
 
 ```
-┌──────────┬──────────┬──────────┐
-│  Left    │  Right   │  Both    │
-└──────────┴──────────┴──────────┘
+┌──────────────────────────────────────────┐
+│ ☑ Sync both eyes   writes mirror L ↔ R   │
+└──────────────────────────────────────────┘
 ```
 
-- **Left/Right:** Changes which eye's parameters are being edited. The sidebar parameters bind to that eye.
-- **Both:** A "link mode" where changing a slider updates both eyes simultaneously.
+When checked, any write to one eye also writes to the other. Unchecked, the
+two eyes are edited independently. Backed by `useEyeSettingsStore.linked`;
+the propagation lives in `useEyeParam`.
 
-The current eye is also reflected on the impaired view's mode toggle (so users see at a glance: "I'm editing left eye AND the bottom view is showing the right eye" is a state they can recover from).
-
-A small "Copy → / ←" button copies the active eye's settings to the other.
+A small "Copy → / ←" button (5.4) copies one eye's full settings to the other.
 
 ## Condition group
 
@@ -94,16 +102,18 @@ A collapsible section, default-collapsed except "Refractive errors" on first loa
 ## Condition panel — the smallest unit
 
 ```
-┌────────────────────────────────────────┐
-│ ◯ Myopia                          [?]  │
-│  Strength    ●──────────  0.40        │
-└────────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│ Myopia (nearsightedness)  [?]  L ☑  R ☐  │
+│ Strength                                 │
+│  L  ●─────────  0.40 ↺                   │
+│  R  ●─────────  0.20 ↺                   │
+└──────────────────────────────────────────┘
 ```
 
-- `◯` is a toggle (filled when enabled). Hover shows a tooltip.
-- `[?]` opens a small popover with a one-paragraph description (sourced from `03-eye-conditions.md`) and a "Reference image" thumbnail.
-- Sliders are HTML `<input type="range">` styled to match tokens. Each slider has a numeric input on the right showing the current value, editable directly.
-- Disabled-condition sliders are visible but greyed out and non-interactive.
+- Header: title, optional `[?]` info hint (Phase 9.3 turns it into a real popover), and **two enabled checkboxes** — one per eye. Each maps to `eyeSettings[side][condition].enabled`.
+- Body: one `RangeRow` per numeric parameter. The param label sits above two `RangeInput` rows (L on top, R below); when an eye is disabled its row greys out.
+- Sliders are HTML `<input type="range">` styled to match tokens. Each slider has a numeric input on the right showing the current value, plus a `↺` reset-to-default button that disables when the value already equals the default.
+- Non-numeric parameters (enum selects, the astigmatism axis dial, etc.) follow the same L-then-R layout but render their own input markup.
 
 Special cases:
 

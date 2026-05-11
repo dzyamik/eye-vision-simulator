@@ -1,11 +1,12 @@
 <script setup lang="ts">
-// Generic shell for one condition in the sidebar: the on/off toggle, the
-// title, an optional info hint, and a slot for parameter sliders. The slot
-// receives `disabled` so children can grey themselves out without having to
-// wire their own enabled binding.
+// Shell for one condition. Header carries the title, an optional info hint,
+// and per-eye enabled checkboxes (L and R) — each eye has its own enabled
+// flag in EyeSettings, so the panel surfaces both. The body slot receives
+// disabledLeft / disabledRight booleans so child RangeRow / select / dial
+// components can grey the appropriate side without rebuilding the binding.
 //
-// The `info` prop becomes a tooltip for now (native title attribute);
-// roadmap step 9.3 swaps it for a real popover.
+// Linked-mode propagation flows through useEyeParam — toggling L's enabled
+// while sync is on flips R's enabled too.
 
 import type { WritableComputedRef } from 'vue';
 
@@ -18,10 +19,15 @@ const props = defineProps<{
   info?: string;
 }>();
 
-// Every condition has an `enabled: boolean`, but TS can't narrow that across
-// the union of EyeSettings[ConditionKey] in a single useEyeParam call — the
-// runtime cast is contained here so callers don't see it.
-const enabled = useEyeParam(
+// 'enabled' exists on every EyeSettings[C], but TS can't narrow that across
+// the union via one useEyeParam call. The cast is contained here.
+const enabledLeft = useEyeParam(
+  'left',
+  props.condition,
+  'enabled' as never,
+) as unknown as WritableComputedRef<boolean>;
+const enabledRight = useEyeParam(
+  'right',
   props.condition,
   'enabled' as never,
 ) as unknown as WritableComputedRef<boolean>;
@@ -30,10 +36,7 @@ const enabled = useEyeParam(
 <template>
   <section class="condition-panel">
     <header class="header">
-      <label class="toggle">
-        <input v-model="enabled" type="checkbox" class="toggle-input" />
-        <span class="title">{{ title }}</span>
-      </label>
+      <h3 class="title">{{ title }}</h3>
       <button
         v-if="info"
         type="button"
@@ -43,9 +46,19 @@ const enabled = useEyeParam(
       >
         ?
       </button>
+      <div class="enables">
+        <label class="enable">
+          <span class="eye-label">L</span>
+          <input v-model="enabledLeft" type="checkbox" class="enable-input" />
+        </label>
+        <label class="enable">
+          <span class="eye-label">R</span>
+          <input v-model="enabledRight" type="checkbox" class="enable-input" />
+        </label>
+      </div>
     </header>
     <div class="body">
-      <slot :disabled="!enabled" />
+      <slot :disabled-left="!enabledLeft" :disabled-right="!enabledRight" />
     </div>
   </section>
 </template>
@@ -65,27 +78,15 @@ const enabled = useEyeParam(
   display: flex;
   align-items: center;
   gap: var(--pad-sm);
-}
-
-.toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--pad-sm);
-  cursor: pointer;
-  flex: 1;
-}
-
-.toggle-input {
-  accent-color: var(--accent);
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
+  flex-wrap: wrap;
 }
 
 .title {
   font-size: var(--t);
   font-weight: 600;
   color: var(--fg);
+  margin: 0;
+  flex: 1;
 }
 
 .info-btn {
@@ -105,6 +106,32 @@ const enabled = useEyeParam(
 .info-btn:hover {
   color: var(--accent);
   border-color: var(--accent);
+}
+
+.enables {
+  display: flex;
+  gap: var(--pad-sm);
+}
+
+.enable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.eye-label {
+  font-size: var(--t-sm);
+  font-family: var(--font-mono);
+  color: var(--fg-dim);
+  font-weight: 600;
+}
+
+.enable-input {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
 }
 
 .body {

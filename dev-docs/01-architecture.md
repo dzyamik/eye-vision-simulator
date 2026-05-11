@@ -71,10 +71,12 @@ src/
 │   │   └── ViewModeToggle.vue    # both / left / right / split
 │   │
 │   └── sidebar/
-│       ├── Sidebar.vue           # scrollable container
-│       ├── EyeSelector.vue       # left / right / both tabs
+│       ├── AppSidebar.vue        # scrollable container (renamed from Sidebar to satisfy vue/multi-word-component-names)
+│       ├── SyncToggle.vue        # "Sync both eyes" checkbox (replaced the original L/R/Both EyeSelector after 5.2 — see 05-ui-ux-design.md "Sidebar layout")
 │       ├── ConditionGroup.vue    # collapsible group (e.g. "Refractive errors")
-│       ├── ConditionPanel.vue    # one condition's sliders + on/off
+│       ├── ConditionPanel.vue    # one condition's shell: title + per-eye enabled toggles + slot
+│       ├── RangeRow.vue          # one numeric param, rendered as L row + R row
+│       ├── RangeInput.vue        # leaf slider (label + range + numeric input + reset)
 │       ├── MaskPanel.vue         # per-eye scotoma canvas + brush controls
 │       └── PresetPanel.vue       # load / save / clear / sample presets
 │

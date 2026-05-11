@@ -3,8 +3,8 @@ import { onMounted } from 'vue';
 
 import AppShell from '@/components/layout/AppShell.vue';
 import AppSidebar from '@/components/sidebar/AppSidebar.vue';
-import EyeSelector from '@/components/sidebar/EyeSelector.vue';
 import MyopiaPanel from '@/components/sidebar/MyopiaPanel.vue';
+import SyncToggle from '@/components/sidebar/SyncToggle.vue';
 import ImageViewer from '@/components/viewer/ImageViewer.vue';
 import { useImageStore } from '@/stores/image';
 import { useToastStore } from '@/stores/toast';
@@ -29,7 +29,7 @@ onMounted(async () => {
 
     <template #sidebar>
       <AppSidebar>
-        <EyeSelector />
+        <SyncToggle />
         <MyopiaPanel />
       </AppSidebar>
     </template>

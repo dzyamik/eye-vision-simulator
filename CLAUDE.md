@@ -69,6 +69,12 @@ These are non-negotiable. Following them keeps the codebase coherent across many
 - Side effects go in composables, not inline in components.
 - Reactivity flows **Pinia → Vue → Phaser**. Phaser never owns canonical state.
 
+### Sidebar UX (decided 2026-05-11, after 5.2)
+
+- The sidebar shows **both eyes' controls per condition** — each `ConditionPanel` has L and R enabled checkboxes in its header and renders L + R rows for every numeric parameter via `RangeRow`.
+- A single `SyncToggle` at the top of the sidebar is bound to `useEyeSettingsStore.linked`. When on, writes to one eye mirror to the other (logic lives in `useEyeParam`).
+- Old spec sketch (a `Left | Right | Both` tab, one set of controls) was replaced after user feedback during 5.2; see [`dev-docs/05-ui-ux-design.md`](./dev-docs/05-ui-ux-design.md) §Sidebar layout.
+
 ### Phaser
 
 - The Phaser game is created once, in a composable (`usePhaser.ts`). Vue owns the canvas mount point.
