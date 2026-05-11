@@ -5,6 +5,7 @@
 
 import { ref } from 'vue';
 
+import ToastStack from './ToastStack.vue';
 import TopBar from './TopBar.vue';
 
 const sidebarOpen = ref(false);
@@ -38,6 +39,8 @@ function closeSidebar(): void {
         @click="closeSidebar"
       />
     </div>
+
+    <ToastStack />
   </div>
 </template>
 

@@ -1,9 +1,36 @@
 <script setup lang="ts">
-// TopBar: branding, sample-image dropdown (wired in 3.4), Upload (3.3), and a
-// hamburger that emits "toggle-sidebar" on small screens. Visual only here;
-// no store interaction yet.
+// TopBar: branding, sample-image dropdown (wired in 3.4), Upload button, and
+// a hamburger that emits "toggle-sidebar" on small screens. The Upload button
+// triggers a hidden file input; on selection we delegate to image.setFromFile
+// and surface any error (e.g. file > 10 MB) via the toast queue.
+
+import { ref } from 'vue';
+
+import { useImageStore } from '@/stores/image';
+import { useToastStore } from '@/stores/toast';
 
 defineEmits<{ 'toggle-sidebar': [] }>();
+
+const image = useImageStore();
+const toast = useToastStore();
+const fileInput = ref<HTMLInputElement | null>(null);
+
+function openPicker(): void {
+  fileInput.value?.click();
+}
+
+async function onPicked(e: Event): Promise<void> {
+  const input = e.target as HTMLInputElement;
+  const file = input.files?.[0];
+  // Reset so picking the same filename twice in a row still fires `change`.
+  input.value = '';
+  if (!file) return;
+  try {
+    await image.setFromFile(file);
+  } catch (err) {
+    toast.push((err as Error).message, { type: 'error' });
+  }
+}
 </script>
 
 <template>
@@ -36,7 +63,14 @@ defineEmits<{ 'toggle-sidebar': [] }>();
         <option>Sample images…</option>
       </select>
 
-      <button type="button" class="upload" disabled>Upload</button>
+      <input
+        ref="fileInput"
+        type="file"
+        accept="image/*"
+        class="file-input"
+        @change="onPicked"
+      />
+      <button type="button" class="upload" @click="openPicker">Upload</button>
     </div>
   </header>
 </template>
@@ -77,10 +111,19 @@ defineEmits<{ 'toggle-sidebar': [] }>();
   font-size: var(--t-sm);
 }
 
+.upload:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .sample-select:disabled,
 .upload:disabled {
   color: var(--fg-dim);
   cursor: not-allowed;
+}
+
+.file-input {
+  display: none;
 }
 
 .hamburger {

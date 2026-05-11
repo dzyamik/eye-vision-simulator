@@ -109,9 +109,9 @@ Goal: a static page that loads an image into Pinia and renders it (no Phaser yet
 
 ### 3.3 Image upload
 
-- [ ] File picker in `TopBar` calls `image.setFromFile`.
-- [ ] Drag-drop anywhere on the viewer area calls the same action.
-- [ ] Reject files >10 MB with a toast.
+- [x] File picker in `TopBar` calls `image.setFromFile`.
+- [x] Drag-drop anywhere on the viewer area calls the same action.
+- [x] Reject files >10 MB with a toast.
 
 **Acceptance:** Dragging an image onto the page updates the top viewer; the filename appears in a small caption.
 

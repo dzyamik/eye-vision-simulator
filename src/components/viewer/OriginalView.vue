@@ -1,35 +1,13 @@
 <script setup lang="ts">
 // Renders the unmodified source image (top half of the viewer). Reads
 // useImageStore directly — no props — so swapping images anywhere in the app
-// updates the view automatically. The empty-state "Load test image" button is
-// a 3.2 stand-in for real upload UX (lands in 3.3).
+// updates the view automatically.
 
 import { storeToRefs } from 'pinia';
 
 import { useImageStore } from '@/stores/image';
 
-const store = useImageStore();
-const { current } = storeToRefs(store);
-
-// Inline SVG so we don't bundle a binary asset just for one dev affordance.
-const TEST_IMAGE_SRC =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200">
-      <rect fill="#1d212c" width="320" height="200"/>
-      <circle cx="160" cy="100" r="60" fill="#7aa2ff"/>
-      <text x="160" y="180" text-anchor="middle" fill="#e8eaed" font-family="sans-serif" font-size="16">test image</text>
-    </svg>`,
-  );
-
-function loadTestImage(): void {
-  store.setFromSample({
-    src: TEST_IMAGE_SRC,
-    width: 320,
-    height: 200,
-    filename: 'test-image.svg',
-  });
-}
+const { current } = storeToRefs(useImageStore());
 </script>
 
 <template>
@@ -48,10 +26,7 @@ function loadTestImage(): void {
 
     <div v-else class="empty">
       <p>No image yet.</p>
-      <p class="hint">Drop one here or pick a sample (3.3 / 3.4).</p>
-      <button type="button" class="dev-button" @click="loadTestImage">
-        Load test image
-      </button>
+      <p class="hint">Drag one onto the viewer or click <strong>Upload</strong>.</p>
     </div>
   </div>
 </template>
@@ -101,20 +76,5 @@ function loadTestImage(): void {
 
 .hint {
   font-size: var(--t-sm);
-}
-
-.dev-button {
-  margin-top: var(--pad-sm);
-  padding: 6px 12px;
-  background: var(--bg-3);
-  color: var(--fg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--t-sm);
-}
-
-.dev-button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 </style>
