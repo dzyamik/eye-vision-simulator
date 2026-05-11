@@ -10,6 +10,7 @@ import ColorVisionPanel from '@/components/sidebar/ColorVisionPanel.vue';
 import ConditionGroup from '@/components/sidebar/ConditionGroup.vue';
 import CustomMaskPanel from '@/components/sidebar/CustomMaskPanel.vue';
 import DiabeticRetinopathyPanel from '@/components/sidebar/DiabeticRetinopathyPanel.vue';
+import EyeActions from '@/components/sidebar/EyeActions.vue';
 import FloatersPanel from '@/components/sidebar/FloatersPanel.vue';
 import GlaucomaPanel from '@/components/sidebar/GlaucomaPanel.vue';
 import HyperopiaPanel from '@/components/sidebar/HyperopiaPanel.vue';
@@ -43,6 +44,7 @@ onMounted(async () => {
     <template #sidebar>
       <AppSidebar>
         <SyncToggle />
+        <EyeActions />
 
         <ConditionGroup
           title="Refractive errors"

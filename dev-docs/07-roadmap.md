@@ -192,8 +192,8 @@ Goal: full sidebar UI with all sliders and toggles, wired to Pinia. Still no sha
 
 ### 5.4 Reset and copy actions
 
-- [ ] "Reset eye" button in each eye's settings area calls `resetEye`.
-- [ ] "Copy → other eye" button calls `copy`.
+- [x] "Reset eye" button in each eye's settings area calls `resetEye`.
+- [x] "Copy → other eye" button calls `copy`.
 
 **Acceptance:** Both work as expected.
 
