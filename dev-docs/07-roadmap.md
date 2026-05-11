@@ -340,7 +340,7 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 8.4 Copy mask to other eye
 
-- [ ] Button copies the active eye's `maskData` to the other.
+- [x] Button copies the active eye's `maskData` to the other.
 
 **Acceptance:** Works without side effects (deep clone).
 

@@ -88,6 +88,25 @@ function clearActive(): void {
   pushToStore();
 }
 
+function copyToOther(): void {
+  const fromMask = activeMask.value;
+  const otherSide: Side = activeSide.value === 'left' ? 'right' : 'left';
+  const toMask = otherSide === 'left' ? leftMask : rightMask;
+  const toCtx = toMask.canvas.getContext('2d');
+  if (toCtx === null) return;
+  // drawImage produces an independent copy in the target's pixel buffer
+  // (deep clone per the spec's acceptance — subsequent edits on either
+  // canvas don't touch the other).
+  toCtx.clearRect(0, 0, toMask.canvas.width, toMask.canvas.height);
+  toCtx.drawImage(fromMask.canvas, 0, 0);
+  const data = toCtx.getImageData(0, 0, toMask.canvas.width, toMask.canvas.height);
+  eye[otherSide].customMask.maskData = markRaw(data);
+}
+
+const copyLabel = computed(() =>
+  activeSide.value === 'left' ? 'Copy → R' : 'Copy → L',
+);
+
 // Whenever the mount point appears or the active side changes, swap which
 // canvas is the visible child of the mount node. Both canvases live in
 // memory either way — we just show one at a time.
@@ -187,6 +206,10 @@ onBeforeUnmount(() => {
         Clear
       </button>
     </div>
+
+    <button type="button" class="copy-btn" @click="copyToOther">
+      {{ copyLabel }}
+    </button>
   </div>
 </template>
 
@@ -300,5 +323,20 @@ onBeforeUnmount(() => {
 
 .mode-btn--clear:hover {
   border-color: var(--warn);
+}
+
+.copy-btn {
+  background: var(--bg-3);
+  color: var(--fg);
+  padding: 6px 0;
+  font-size: var(--t-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 </style>
