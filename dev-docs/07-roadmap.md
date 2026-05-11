@@ -166,8 +166,8 @@ Goal: full sidebar UI with all sliders and toggles, wired to Pinia. Still no sha
 
 ### 5.1 `EyeSelector`
 
-- [ ] Segmented toggle Left / Right / Both bound to `useViewSettingsStore.activeEye`.
-- [ ] When "Both" is active, set `useEyeSettingsStore.linked = true`. When Left or Right, set it false and target that eye.
+- [x] Segmented toggle Left / Right / Both bound to `useViewSettingsStore.activeEye`.
+- [x] When "Both" is active, set `useEyeSettingsStore.linked = true`. When Left or Right, set it false and target that eye.
 
 **Acceptance:** Switching tabs updates the store; "Both" mirrors edits across eyes.
 
