@@ -96,6 +96,19 @@ The `base` path in `vite.config.ts` must match `/<repo>/` so assets resolve corr
 
 This tool is a **simulation for learning and empathy-building purposes only**. The visuals are best-effort approximations based on published research; they are not medical diagnoses, not personalized to any real patient, and not a substitute for an eye care professional. Real vision impairments are heterogeneous, evolve over time, and involve neurological compensations that can't be captured on a screen.
 
+## Sample image credits
+
+The bundled sample images in `public/samples/` are sourced from Wikimedia Commons:
+
+| Image                    | Author                 | License                                                                                                       |
+| ------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `nordic-house.jpg`       | Boereck                | [Public domain](https://commons.wikimedia.org/wiki/File:Nordisches_Einfamilienhaus.jpg)                       |
+| `pompei-sidewalk.jpg`    | Tanya Dedyukhina       | [CC BY 3.0](https://commons.wikimedia.org/wiki/File:Pompei_-_panoramio_(26).jpg)                              |
+| `prairie-clouds.jpg`     | Wing-Chi Poon          | [CC BY-SA 2.5](https://commons.wikimedia.org/wiki/File:Cumulus_Clouds_over_Yellow_Prairie2.jpg)               |
+| `crosswalk.jpg`          | Alex Proimos           | [CC BY 2.0](https://commons.wikimedia.org/wiki/File:CrossWalk_(5465840138).jpg)                               |
+
+Each image was resized to 1280 px wide; the originals are linked above.
+
 ## License
 
-MIT.
+The application code is MIT. Bundled sample images retain their original licenses (see above) — attribution and any share-alike obligations apply to the images themselves, not to derivative software.

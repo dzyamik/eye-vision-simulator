@@ -11,9 +11,20 @@ export interface ImageSource {
   width: number;
   height: number;
   filename?: string;
+  /** Human-friendly label for sample images. Falls back to filename when absent. */
+  name?: string;
+}
+
+interface SampleManifestEntry {
+  filename: string;
+  width: number;
+  height: number;
+  name?: string;
 }
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const SAMPLES_BASE = `${import.meta.env.BASE_URL}samples/`;
+const MANIFEST_URL = `${SAMPLES_BASE}index.json`;
 
 export const useImageStore = defineStore('image', () => {
   const current = ref<ImageSource | null>(null);
@@ -32,5 +43,26 @@ export const useImageStore = defineStore('image', () => {
     current.value = s;
   }
 
-  return { current, sampleImages, setFromFile, setFromSample };
+  // Fetched once at app start (App.vue's onMounted). Sets the first sample
+  // as the default if no image has been chosen yet, so the user never lands
+  // on an empty viewer.
+  async function loadSampleManifest(): Promise<void> {
+    const res = await fetch(MANIFEST_URL);
+    if (!res.ok) {
+      throw new Error(`Sample manifest fetch failed (${res.status})`);
+    }
+    const entries = (await res.json()) as SampleManifestEntry[];
+    sampleImages.value = entries.map((e) => ({
+      src: SAMPLES_BASE + e.filename,
+      width: e.width,
+      height: e.height,
+      filename: e.filename,
+      name: e.name,
+    }));
+    if (current.value === null && sampleImages.value.length > 0) {
+      current.value = sampleImages.value[0]!;
+    }
+  }
+
+  return { current, sampleImages, setFromFile, setFromSample, loadSampleManifest };
 });

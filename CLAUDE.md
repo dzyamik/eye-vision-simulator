@@ -87,7 +87,7 @@ If the user has you commit, use Conventional Commits:
 - Do **not** add a backend, API calls, telemetry, or analytics. This is a 100% client-side app.
 - Do **not** write CI/CD pipelines beyond what's in `09-mcp-and-tools.md`. The user explicitly opted out.
 - Do **not** put medical advice anywhere. This is an educational simulator; the disclaimer in the README is the limit.
-- Do **not** reproduce copyrighted material. Sample images must be either user-provided, public domain, or generated.
+- Do **not** reproduce copyrighted material. Sample images must be either user-provided, public domain, generated, or freely-licensed (e.g. CC-BY / CC-BY-SA from Wikimedia Commons) **with proper attribution recorded in `README.md`** and a `credit` field in `public/samples/index.json`.
 
 ## 6. When you finish a session
 

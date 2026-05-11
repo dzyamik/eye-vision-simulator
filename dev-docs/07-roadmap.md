@@ -117,10 +117,10 @@ Goal: a static page that loads an image into Pinia and renders it (no Phaser yet
 
 ### 3.4 Sample images
 
-- [ ] Add 4–6 public-domain images to `public/samples/`.
-- [ ] Add a manifest (`public/samples/index.json`) listing them with width/height/filename.
-- [ ] Fetch the manifest at app start, populate `image.sampleImages`.
-- [ ] Dropdown in `TopBar` lets the user pick one.
+- [x] Add 4–6 public-domain images to `public/samples/`.
+- [x] Add a manifest (`public/samples/index.json`) listing them with width/height/filename.
+- [x] Fetch the manifest at app start, populate `image.sampleImages`.
+- [x] Dropdown in `TopBar` lets the user pick one.
 
 **Acceptance:** Each sample loads. The default sample is shown on first paint.
 

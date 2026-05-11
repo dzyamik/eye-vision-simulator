@@ -1,9 +1,12 @@
 <script setup lang="ts">
-// TopBar: branding, sample-image dropdown (wired in 3.4), Upload button, and
-// a hamburger that emits "toggle-sidebar" on small screens. The Upload button
-// triggers a hidden file input; on selection we delegate to image.setFromFile
-// and surface any error (e.g. file > 10 MB) via the toast queue.
+// TopBar: branding, sample-image dropdown, Upload button, and a hamburger
+// that emits "toggle-sidebar" on small screens. The Upload button triggers a
+// hidden file input; on selection we delegate to image.setFromFile and
+// surface any error (e.g. file > 10 MB) via the toast queue. The dropdown
+// reads sampleImages from the store (populated by image.loadSampleManifest()
+// in App.vue's onMounted) and pushes via image.setFromSample.
 
+import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 
 import { useImageStore } from '@/stores/image';
@@ -13,6 +16,7 @@ defineEmits<{ 'toggle-sidebar': [] }>();
 
 const image = useImageStore();
 const toast = useToastStore();
+const { sampleImages } = storeToRefs(image);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 function openPicker(): void {
@@ -30,6 +34,16 @@ async function onPicked(e: Event): Promise<void> {
   } catch (err) {
     toast.push((err as Error).message, { type: 'error' });
   }
+}
+
+function onSampleChange(e: Event): void {
+  const select = e.target as HTMLSelectElement;
+  const filename = select.value;
+  // Reset so picking the same sample again still fires `change`.
+  select.value = '';
+  if (!filename) return;
+  const sample = sampleImages.value.find((s) => s.filename === filename);
+  if (sample) image.setFromSample(sample);
 }
 </script>
 
@@ -59,8 +73,16 @@ async function onPicked(e: Event): Promise<void> {
     <h1 class="brand">Eye Vision Simulator</h1>
 
     <div class="actions">
-      <select class="sample-select" disabled aria-label="Sample images">
-        <option>Sample images…</option>
+      <select
+        class="sample-select"
+        :disabled="sampleImages.length === 0"
+        aria-label="Sample images"
+        @change="onSampleChange"
+      >
+        <option value="">Sample images…</option>
+        <option v-for="s in sampleImages" :key="s.filename" :value="s.filename">
+          {{ s.name ?? s.filename }}
+        </option>
       </select>
 
       <input
