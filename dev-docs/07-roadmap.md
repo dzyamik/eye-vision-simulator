@@ -35,9 +35,9 @@ Goal: get a Vite + Vue + TS + Pinia + Phaser project building to `./docs/` with 
 **Acceptance:** `npm run build` produces a `docs/` folder; `npm run preview` serves it at the correct base path.
 
 ### 1.4 Folder skeleton
-- [ ] Create empty folders matching [`01-architecture.md`](./01-architecture.md): `src/{components/{layout,viewer,sidebar},composables,stores,phaser/{pipelines,shaders},constants,types,styles,utils}`.
-- [ ] Add `.gitkeep` files where needed.
-- [ ] Move base styles in: `reset.css`, `tokens.css` (from [`05-ui-ux-design.md`](./05-ui-ux-design.md)), empty `app.css`.
+- [x] Create empty folders matching [`01-architecture.md`](./01-architecture.md): `src/{components/{layout,viewer,sidebar},composables,stores,phaser/{pipelines,shaders},constants,types,styles,utils}`.
+- [x] Add `.gitkeep` files where needed.
+- [x] Move base styles in: `reset.css`, `tokens.css` (from [`05-ui-ux-design.md`](./05-ui-ux-design.md)), empty `app.css`.
 
 **Acceptance:** `ls src/` matches the architecture doc; the build still succeeds.
 
