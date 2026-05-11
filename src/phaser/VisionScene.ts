@@ -12,6 +12,13 @@ import Phaser from 'phaser';
 export class VisionScene extends Phaser.Scene {
   static readonly KEY = 'VisionScene';
 
+  /** Resolves when create() has run. The promise is constructed synchronously
+   *  in the scene's constructor, so usePhaser can hand it to callers
+   *  immediately without touching Phaser's not-yet-booted scene plugins
+   *  (`scene.events` is only available after Phaser initialises the scene). */
+  readonly ready: Promise<void>;
+  private resolveReady!: () => void;
+
   private sprite: Phaser.GameObjects.Image | null = null;
   private currentTextureKey: string | null = null;
   private pendingSrc: string | null = null;
@@ -20,6 +27,9 @@ export class VisionScene extends Phaser.Scene {
 
   constructor() {
     super({ key: VisionScene.KEY });
+    this.ready = new Promise<void>((resolve) => {
+      this.resolveReady = resolve;
+    });
   }
 
   create(): void {
@@ -30,6 +40,7 @@ export class VisionScene extends Phaser.Scene {
       this.pendingSrc = null;
       this.setImage(src);
     }
+    this.resolveReady();
   }
 
   setImage(src: string): void {

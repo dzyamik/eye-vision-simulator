@@ -24,9 +24,10 @@ let gameReady: Promise<void> | null = null;
 export function usePhaser(parent: HTMLElement): PhaserBridge {
   if (handle === null) {
     handle = createGame(parent);
-    gameReady = new Promise<void>((resolve) => {
-      handle!.scene.events.once('create', () => resolve());
-    });
+    // VisionScene constructs `ready` synchronously, so we can just hand it
+    // through. (We can't subscribe to scene.events here directly — Phaser
+    // hasn't initialised the scene's plugin instances yet at this point.)
+    gameReady = handle.scene.ready;
   }
 
   // Snapshot the promise at call time. After dispose() we set the module
