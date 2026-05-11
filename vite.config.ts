@@ -3,11 +3,14 @@ import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
-const repoName = 'eye-vision-simulator';
-
 export default defineConfig({
   plugins: [vue()],
-  base: `/${repoName}/`,
+  // Relative base ('./') so the built docs/ can be served from any path —
+  // GH Pages /<repo>/, a CDN subdirectory, file://, etc. — without
+  // recompiling. import.meta.env.BASE_URL is './' in production builds and
+  // '/' in dev; runtime URL builds (sample manifest, samples/*.jpg) use
+  // BASE_URL so they resolve correctly against either.
+  base: './',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

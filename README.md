@@ -64,13 +64,13 @@ See [`dev-docs/02-tech-stack.md`](./dev-docs/02-tech-stack.md) for the full rati
 # Install
 npm install
 
-# Run dev server (http://localhost:5173/eye-vision-simulator/)
+# Run dev server (http://localhost:5173/)
 npm run dev
 
 # Build to ./docs for GitHub Pages
 npm run build
 
-# Preview the production build locally (http://localhost:4173/eye-vision-simulator/)
+# Preview the production build locally (http://localhost:4173/)
 npm run preview
 
 # Lint / format / test
@@ -89,7 +89,11 @@ npm run test:run     # single-shot
    - **Branch:** `main` / `/docs`
 4. The site goes live at `https://<user>.github.io/<repo>/`.
 
-The `base` path in `vite.config.ts` is hard-coded to `/eye-vision-simulator/` so asset URLs resolve correctly under the GH Pages subdirectory. If you fork to a different repo name, update `repoName` at the top of `vite.config.ts` to match.
+`vite.config.ts` uses `base: './'`, so the built assets reference each
+other with relative paths. The same `docs/` build serves correctly from
+any subdirectory (`https://example.com/some/sub/path/`), from
+`file://`, or from a CDN — no rebuild needed when the deployment path
+changes.
 
 ## Project structure
 
