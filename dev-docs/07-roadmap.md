@@ -317,9 +317,9 @@ Goal: paint per-eye scotomas onto a canvas, apply as a pipeline effect.
 
 ### 8.1 `useMaskCanvas.ts` composable
 
-- [ ] Owns the offscreen canvas + paint state.
-- [ ] `paintAt(x, y, size, hardness, mode)` applies a brush stroke.
-- [ ] Returns `ImageData` on demand, debounced.
+- [x] Owns the offscreen canvas + paint state.
+- [x] `paintAt(x, y, size, hardness, mode)` applies a brush stroke.
+- [x] Returns `ImageData` on demand, debounced.
 
 **Acceptance:** Unit-testable; manually verified that calling `paintAt` modifies the canvas.
 
