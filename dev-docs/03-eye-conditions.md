@@ -41,6 +41,8 @@ The eye is too long or the cornea too curved; distant objects appear blurred whi
 
 **Implementation notes:** Use a 2-pass separable Gaussian for performance. The blur radius (in pixels) scales with `strength * maxBlurPx` where `maxBlurPx` is e.g. 24. Anti-clamping at the edges via texture-clamp sampling.
 
+**UI annotation (post-v1):** the panel renders the `strength` slider with a clinical-units caption per eye showing dioptres + uncorrected visual acuity %. Mapping lives in `src/utils/refractive.ts`: `D = ±6 × strength` and `% = 100 / (1 + k|D|)` with `k = 0.27` for myopia, `0.23` for hyperopia (standard "convert prescription to 20/20 scale" approximation; sources cited in the file header).
+
 ### Hyperopia (farsightedness)
 
 Eye too short / lens too flat; near objects appear blurred, distance ok. Visually, the simulator can't really tell the user's eye-to-screen distance, so we treat it as the same blur effect as myopia but flag it differently in the UI for educational clarity.
@@ -49,6 +51,8 @@ Eye too short / lens too flat; near objects appear blurred, distance ok. Visuall
 | ---------- | --------- | ------- | --------------- |
 | `enabled`  | bool      | false   |                 |
 | `strength` | 0.0 – 1.0 | 0.0     | Same as myopia. |
+
+**UI annotation (post-v1):** same dioptre + acuity caption as myopia, but with positive D and the hyperopia `k` constant.
 
 ### Astigmatism
 

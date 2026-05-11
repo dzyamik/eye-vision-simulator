@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ConditionPanel from './ConditionPanel.vue';
 import RangeRow from './RangeRow.vue';
+import RefractiveCaption from './RefractiveCaption.vue';
 </script>
 
 <template>
@@ -17,6 +18,7 @@ import RangeRow from './RangeRow.vue';
         :disabled-left="disabledLeft"
         :disabled-right="disabledRight"
       />
+      <RefractiveCaption type="hyperopia" />
     </template>
   </ConditionPanel>
 </template>
