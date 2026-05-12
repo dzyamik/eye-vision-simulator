@@ -56,7 +56,7 @@ Eye too short / lens too flat; near objects appear blurred, distance ok. Visuall
 
 ### Astigmatism
 
-The cornea is shaped more like a rugby ball than a sphere. Light focuses on multiple planes, causing direction-dependent blur. A vertically-oriented astigmatism blurs vertical lines more than horizontal, and vice versa.
+The cornea is shaped more like a rugby ball than a sphere. Light focuses on multiple planes, causing direction-dependent blur along a single meridian. The cylinder **axis** is the meridian along which the lens has no refractive power — lines parallel to the axis stay sharp, lines perpendicular smear. So **with-the-rule** astigmatism (axis ≈ 90°, vertical) smears the image vertically (vertical lines stay sharp, horizontal lines blur); **against-the-rule** (axis ≈ 0° / 180°) smears horizontally. References: JOV / ARVO "Adaptation to astigmatic blur"; Wikipedia "Astigmatism (eye)"; AAO basic-optics chapter.
 
 | Param       | Range         | Default | Meaning                             |
 | ----------- | ------------- | ------- | ----------------------------------- |

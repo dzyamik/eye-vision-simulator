@@ -30,5 +30,13 @@
     "height": 853,
     "credit": "Alex Proimos, CC BY 2.0",
     "source": "https://commons.wikimedia.org/wiki/File:CrossWalk_(5465840138).jpg"
+  },
+  {
+    "filename": "astigmatism-dial.png",
+    "name": "Astigmatism dial (test chart)",
+    "width": 1024,
+    "height": 1024,
+    "credit": "Generated for this project, public domain",
+    "source": "scripts/generate-astigmatism-dial.py"
   }
 ]

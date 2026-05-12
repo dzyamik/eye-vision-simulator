@@ -109,7 +109,8 @@ src/
 │   │   ├── MigraineAuraPipeline.ts
 │   │   └── CustomMaskPipeline.ts  # uses the painted texture
 │   └── shaders/
-│       └── glaucoma.frag.glsl      # only custom GLSL in v1 — see note below
+│       ├── astigmatism.frag.glsl   # directional Gaussian along the cyl axis
+│       └── glaucoma.frag.glsl      # tunable-feather peripheral vignette
 │
 ├── constants/
 │   ├── colorMatrices.ts          # protan/deutan/tritan matrices + severity
@@ -126,13 +127,15 @@ src/
     └── app.css
 ```
 
-> **Why only one `.frag.glsl`?** Phaser 4's built-in `Filters` cover blur,
-> color-matrix, blend, vignette, and displacement — enough for every
-> condition in v1 except the one whose spec parameter (glaucoma's tunable
-> `feather`) doesn't fit the built-in Vignette's fixed falloff curve.
-> `GlaucomaPipeline.ts` therefore registers a custom RenderNode that
-> extends `Phaser.Renderer.WebGL.RenderNodes.BaseFilterShader` with our
-> own fragment shader. Future custom shaders follow the same pattern.
+> **Why these `.frag.glsl` files?** Phaser 4's built-in `Filters` cover
+> color-matrix, blend, vignette, and (separable) blur — enough for most
+> conditions. Two cases needed custom GLSL: glaucoma's tunable `feather`
+> (the built-in Vignette has a fixed falloff curve) and astigmatism's
+> oblique-angle blur (the built-in Blur is separable, so it degrades to
+> rotationally-symmetric blur at 45°/135° instead of a diagonal smear).
+> Both pipelines register a custom RenderNode that extends
+> `Phaser.Renderer.WebGL.RenderNodes.BaseFilterShader`. Future custom
+> shaders follow the same pattern.
 
 ## Data flow walkthrough — "user drags the myopia slider"
 

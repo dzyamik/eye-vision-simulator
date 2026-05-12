@@ -159,10 +159,11 @@ function syncAstigmatismFromStore(
   viewMode: ViewMode,
   cam: Phaser.Cameras.Scene2D.Camera,
 ): void {
+  if (scene === null) return;
   const [actL, actR] = pickPair(viewMode, eye.left.astigmatism.enabled, eye.right.astigmatism.enabled);
   const [mL, mR] = pickPair(viewMode, eye.left.astigmatism.magnitude, eye.right.astigmatism.magnitude);
   const [axL, axR] = pickPair(viewMode, eye.left.astigmatism.axis, eye.right.astigmatism.axis);
-  syncAstigmatism(cam, {
+  syncAstigmatism(scene, cam, {
     leftActive: actL,
     leftMagnitude: mL,
     leftAxis: axL,

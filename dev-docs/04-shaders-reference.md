@@ -67,10 +67,17 @@ The pipeline runs this twice (horizontal then vertical). Phaser's `PostFXPipelin
 
 Single pass, kernel weights elongated along the axis vector.
 
+> **Status:** implemented in v1 as a custom GLSL filter. The earlier
+> Phaser-Blur adapter was scrapped — Phaser's `Filters.Blur` is separable
+> (independent x/y passes), so oblique angles like 45° collapsed to
+> rotationally-symmetric blur instead of a diagonal smear. The custom
+> filter samples along `(cos θ, sin θ)` so the kernel is correctly
+> oriented at any angle. See `src/phaser/pipelines/AstigmatismPipeline.ts`.
+
 ```glsl
 // astigmatism.frag.glsl
 uniform float uMagnitude;    // 0..1
-uniform float uAxisRadians;  // 0..PI
+uniform float uAxisRadians;  // 0..PI (axis = direction of sharp focus)
 uniform vec2 uResolution;
 uniform float uMaxRadius;    // e.g. 24.0
 
