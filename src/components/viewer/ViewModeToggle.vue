@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// Lets the user pick which eye(s) the impaired view renders. For 4.4 this is
-// stub: it writes to useViewSettingsStore.viewMode but pipelineManager
-// doesn't read it yet. Phase 7 turns it into actual rendering behaviour.
+// Lets the user pick which eye(s) the impaired view renders. Writes to
+// useViewSettingsStore.viewMode; pipelineManager.pickPair() reads it to
+// decide which eye's settings feed each camera (single, blended, or split).
 
 import { storeToRefs } from 'pinia';
 

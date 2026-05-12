@@ -1,6 +1,6 @@
 # 07 — Roadmap
 
-Implementation is split into **9 phases**, each broken into small, checkable steps. Work them in order. Tick the box when a step is done.
+Implementation is split into **10 phases**, each broken into small, checkable steps. Work them in order. Tick the box when a step is done.
 
 Each step lists its **acceptance criteria** — concrete things that must be true before the step is considered complete. Don't move on until they're all true.
 
@@ -154,7 +154,7 @@ Goal: a Phaser canvas living inside `ImpairedView`, rendering the current image 
 ### 4.4 View mode toggle (stub)
 
 - [x] `ViewModeToggle.vue` writes to `useViewSettingsStore.viewMode`.
-- [x] Visible options: Both, Left, Right, Split. Implementation in phase 7.
+- [x] Visible options: Both, Left, Right, Split. (Rendering wired in phase 7.)
 
 **Acceptance:** The toggle changes state but has no visual effect yet.
 
@@ -186,7 +186,7 @@ Goal: full sidebar UI with all sliders and toggles, wired to Pinia. Still no sha
 - [x] Lens group: Cataract (subtype radio + four sliders).
 - [x] Field loss group: Glaucoma, AMD, Diabetic retinopathy, Retinitis pigmentosa.
 - [x] Overlays group: Floaters, Migraine aura.
-- [x] Custom mask group: (UI only; canvas wiring in phase 8).
+- [x] Custom mask group: (UI only; canvas wired in phase 8).
 
 **Acceptance:** Every parameter from `03-eye-conditions.md` is reachable in the UI. Tooltips show short descriptions.
 
@@ -464,5 +464,7 @@ stays clean.
 - Gaze-contingent simulation (eye tracking).
 - Arcuate scotoma patterns for glaucoma as a built-in (workaround: custom mask).
 - Mask effects beyond `darken`.
+- Cataract glare (subcapsular's distinctive bloom). Phaser ships no bloom filter and rolling our own was out of scope for v1; the three subtypes still produce distinct outputs via the yellowing/cloudiness/brightnessLoss preset combinations. See `src/phaser/pipelines/CataractPipeline.ts`.
+- Tunable glaucoma `feather` (gradient softness). Phaser's built-in Vignette has a fixed falloff curve; the slider is wired to the store but currently has no visible effect. Swap to a custom shader to fix. See `src/phaser/pipelines/GlaucomaPipeline.ts`.
 
 Track these in GitHub Issues once the repo exists.

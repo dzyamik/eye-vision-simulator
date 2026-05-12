@@ -12,10 +12,11 @@
 // distinct outputs via their preset yellowing/cloudiness/brightnessLoss
 // combinations; subcapsular's distinctive glare lands in v1.1.
 //
-// Both-eye blend: average the four params. The Sidebar's CataractPanel
-// applies subtype presets per eye, so users can already get e.g.
-// "nuclear left, cortical right" pre-blend; Phase 7's view modes will
-// expose these per-side rather than averaging.
+// Both-eye blend: pipelineManager.pickPair() resolves the L/R inputs per
+// view mode before we get here (left/right modes substitute one eye's
+// values into both slots; split mode passes the camera's own eye in
+// both). In 'both' mode the L+R values differ and we average them — a
+// proxy for binocular blending, see dev-docs/07-roadmap.md §7.1.
 
 import Phaser from 'phaser';
 
@@ -76,7 +77,8 @@ export function syncCataract(
   params: CataractParams,
 ): void {
   const anyActive = params.leftActive || params.rightActive;
-  // Phase 6 averages both eyes; Phase 7 will split per view mode.
+  // pipelineManager.pickPair() has already substituted L/R values per
+  // viewMode; the averaging below only matters in 'both' mode.
   const cloudiness = (params.leftCloudiness + params.rightCloudiness) / 2;
   const yellowing = (params.leftYellowing + params.rightYellowing) / 2;
   const brightnessLoss = (params.leftBrightnessLoss + params.rightBrightnessLoss) / 2;

@@ -3,10 +3,9 @@
 //
 // Note: linked-mode propagation is intentionally not tested here. The
 // per-spec design (dev-docs/06-state-management.md §Reactivity rules) keeps
-// the propagation logic in a future `useEyeParam` composable, not in this
-// store. Tests for that composable land alongside its implementation in
-// Phase 5. The test below only confirms the `linked` flag itself is
-// reactive and toggleable.
+// the propagation logic in the `useEyeParam` composable, not in this store
+// — the composable owns its own tests. The test below only confirms the
+// `linked` flag itself is reactive and toggleable.
 
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it } from 'vitest';
