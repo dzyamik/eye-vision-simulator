@@ -118,6 +118,7 @@ changes.
 │   ├── types/                 ← canonical EyeSettings interface
 │   └── utils/                 ← deepClone, image helpers
 ├── public/samples/            ← bundled sample images + manifest
+├── scripts/                   ← one-shot Python helpers (e.g. dial chart)
 ├── docs/                      ← build output (committed for GH Pages)
 ├── package.json
 ├── vite.config.ts
@@ -132,7 +133,7 @@ This tool is a **simulation for learning and empathy-building purposes only**. T
 
 ## Sample image credits
 
-The bundled sample images in `public/samples/` are sourced from Wikimedia Commons:
+The bundled sample images in `public/samples/` are a mix of Wikimedia Commons sources and one chart authored for this project:
 
 | Image                    | Author                 | License                                                                                                       |
 | ------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -140,8 +141,9 @@ The bundled sample images in `public/samples/` are sourced from Wikimedia Common
 | `pompei-sidewalk.jpg`    | Tanya Dedyukhina       | [CC BY 3.0](https://commons.wikimedia.org/wiki/File:Pompei_-_panoramio_(26).jpg)                              |
 | `prairie-clouds.jpg`     | Wing-Chi Poon          | [CC BY-SA 2.5](https://commons.wikimedia.org/wiki/File:Cumulus_Clouds_over_Yellow_Prairie2.jpg)               |
 | `crosswalk.jpg`          | Alex Proimos           | [CC BY 2.0](https://commons.wikimedia.org/wiki/File:CrossWalk_(5465840138).jpg)                               |
+| `astigmatism-dial.png`   | Generated for this project | Public domain. Regenerate with `python3 scripts/generate-astigmatism-dial.py`. A 12-spoke clinical clock-dial for verifying directional blur — pick this sample, enable astigmatism, and the spoke parallel to the axis stays sharpest. |
 
-Each image was resized to 1280 px wide; the originals are linked above.
+The four photographs were resized to 1280 px wide; the originals are linked above.
 
 ## License
 
