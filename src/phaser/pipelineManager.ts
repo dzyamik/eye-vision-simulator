@@ -216,15 +216,19 @@ function syncGlaucomaFromStore(
   viewMode: ViewMode,
   cam: Phaser.Cameras.Scene2D.Camera,
 ): void {
+  if (scene === null) return;
   const [actL, actR] = pickPair(viewMode, eye.left.glaucoma.enabled, eye.right.glaucoma.enabled);
   const [rL, rR] = pickPair(viewMode, eye.left.glaucoma.innerRadius, eye.right.glaucoma.innerRadius);
+  const [fL, fR] = pickPair(viewMode, eye.left.glaucoma.feather, eye.right.glaucoma.feather);
   const [sevL, sevR] = pickPair(viewMode, eye.left.glaucoma.severity, eye.right.glaucoma.severity);
-  syncGlaucoma(cam, {
+  syncGlaucoma(scene, cam, {
     leftActive: actL,
     leftInnerRadius: rL,
+    leftFeather: fL,
     leftSeverity: sevL,
     rightActive: actR,
     rightInnerRadius: rR,
+    rightFeather: fR,
     rightSeverity: sevR,
   });
 }

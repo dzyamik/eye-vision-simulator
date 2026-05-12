@@ -465,6 +465,6 @@ stays clean.
 - Arcuate scotoma patterns for glaucoma as a built-in (workaround: custom mask).
 - Mask effects beyond `darken`.
 - Cataract glare (subcapsular's distinctive bloom). Phaser ships no bloom filter and rolling our own was out of scope for v1; the three subtypes still produce distinct outputs via the yellowing/cloudiness/brightnessLoss preset combinations. See `src/phaser/pipelines/CataractPipeline.ts`.
-- Tunable glaucoma `feather` (gradient softness). Phaser's built-in Vignette has a fixed falloff curve; the slider is wired to the store but currently has no visible effect. Swap to a custom shader to fix. See `src/phaser/pipelines/GlaucomaPipeline.ts`.
+- Tunable retinitis pigmentosa `feather` (gradient softness). RP still uses Phaser's built-in Vignette which has a fixed falloff curve; the slider writes to the store but isn't forwarded to the pipeline. The shaders-reference doc says RP shares glaucoma's shader formula, so the v1.1 fix is to reuse `GlaucomaFilter` (migrated to a custom GLSL shader in v1) and add a brightness term inside the visible region. See `src/phaser/pipelines/RetinitisPigmentosaPipeline.ts`.
 
 Track these in GitHub Issues once the repo exists.

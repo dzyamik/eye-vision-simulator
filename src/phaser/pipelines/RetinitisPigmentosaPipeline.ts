@@ -5,7 +5,11 @@
 //     Runs first so the vignette's preserved area is also dimmed.
 //   - Vignette: tunnelRadius + max strength (RP is severe by definition).
 //
-// Same feather-limitation note as GlaucomaPipeline applies.
+// Limitation: still uses Phaser's built-in Vignette (fixed falloff), so the
+// store's RP `feather` slider isn't forwarded here and has no visible
+// effect. Glaucoma was migrated to a custom shader in v1; per the spec
+// (`04-shaders-reference.md` §Glaucoma) RP shares that shader's logic and
+// can reuse `GlaucomaFilter` plus a brightness term in v1.1.
 
 import type Phaser from 'phaser';
 

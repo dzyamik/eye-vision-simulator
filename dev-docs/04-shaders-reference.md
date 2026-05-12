@@ -189,6 +189,13 @@ These are starting points; the user can drag any slider after.
 
 ## Glaucoma — peripheral vignette
 
+> **Status:** implemented in v1 as the project's only custom GLSL filter.
+> Other field-loss conditions (RP, AMD) use Phaser 4's built-in `Vignette` /
+> `ColorMatrix` filters; glaucoma needed a custom shader so the `feather`
+> uniform could be exposed (the built-in Vignette has a fixed falloff
+> curve). See `src/phaser/pipelines/GlaucomaPipeline.ts` for the
+> RenderNode + Controller wiring.
+
 ```glsl
 // glaucoma.frag.glsl
 uniform float uInnerRadius; // 0..0.7 (normalized)
